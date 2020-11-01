@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhoneShopping.Tests", "Phon
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{52EC90B5-496E-44B7-AB39-5C8359671C94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StaticResources", "StaticResources\StaticResources.csproj", "{275304AE-4E76-46E8-9CD2-48B9E640AFC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{52EC90B5-496E-44B7-AB39-5C8359671C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52EC90B5-496E-44B7-AB39-5C8359671C94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52EC90B5-496E-44B7-AB39-5C8359671C94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{275304AE-4E76-46E8-9CD2-48B9E640AFC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{275304AE-4E76-46E8-9CD2-48B9E640AFC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{275304AE-4E76-46E8-9CD2-48B9E640AFC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{275304AE-4E76-46E8-9CD2-48B9E640AFC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

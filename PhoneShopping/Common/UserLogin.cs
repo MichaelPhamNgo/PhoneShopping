@@ -10,5 +10,6 @@ namespace PhoneShopping
     {
         public long UserId { set; get; }
         public string UserName { set; get; }
+        public string Email { set; get; }
     }
 }

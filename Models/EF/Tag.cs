@@ -9,10 +9,12 @@ namespace Models.EF
     [Table("Tag")]
     public partial class Tag
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Key]
         public long Id { get; set; }
 
+        [Required]
         [StringLength(50)]
+        [MinLength(3)]
         public string TagName { get; set; }
 
         [StringLength(250)]
@@ -27,7 +29,5 @@ namespace Models.EF
         public long? ModifiedBy { get; set; }
 
         public bool? Status { get; set; }
-
-        public int? DisplayOrder { get; set; }
     }
 }

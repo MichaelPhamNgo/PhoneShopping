@@ -156,7 +156,6 @@
     <Compile Include="Areas\Admin\Models\CreateUserModel.cs" />
     <Compile Include="Areas\Admin\Models\LoginModel.cs" />
     <Compile Include="Common\CommonConstants.cs" />
-    <Compile Include="Common\Encrypter.cs" />
     <Compile Include="Common\Helper.cs" />
     <Compile Include="Common\UserLogin.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -168,6 +167,13 @@
   <ItemGroup>
     <Content Include="Assets\Admin\build\css\custom.css" />
     <Content Include="Assets\Admin\build\css\custom.min.css" />
+    <Content Include="Assets\Admin\build\css\jquery-ui.css" />
+    <Content Include="Assets\Admin\build\css\jquery-ui.min.css" />
+    <Content Include="Assets\Admin\build\css\jquery-ui.structure.css" />
+    <Content Include="Assets\Admin\build\css\jquery-ui.structure.min.css" />
+    <Content Include="Assets\Admin\build\css\jquery-ui.theme.css" />
+    <Content Include="Assets\Admin\build\css\jquery-ui.theme.min.css" />
+    <Content Include="Assets\Admin\build\css\dataTables.bootstrap4.min.css" />
     <Content Include="Assets\Admin\build\css\maps\jquery-jvectormap-2.0.3.css" />
     <Content Include="Assets\Admin\build\images\american-express.png" />
     <Content Include="Assets\Admin\build\images\back_disabled.png" />
@@ -192,9 +198,12 @@
     <Content Include="Assets\Admin\build\images\prod-5.jpg" />
     <Content Include="Assets\Admin\build\images\user.png" />
     <Content Include="Assets\Admin\build\images\visa.png" />
+    <Content Include="Assets\Admin\build\js\controller\tagController.js" />
     <Content Include="Assets\Admin\build\js\custom.js" />
     <Content Include="Assets\Admin\build\js\custom.min.js" />
     <Content Include="Assets\Admin\build\js\datepicker\daterangepicker.js" />
+    <Content Include="Assets\Admin\build\js\jquery-ui.js" />
+    <Content Include="Assets\Admin\build\js\jquery-ui.min.js" />
     <Content Include="Assets\Admin\build\js\moment\moment.min.js" />
     <Content Include="Assets\Admin\docs\css\animate.min.css" />
     <Content Include="Assets\Admin\docs\css\bootstrap.min.css" />
@@ -4985,6 +4994,9 @@
     <Content Include="Assets\Admin\vendors\validator\package.json" />
     <Content Include="Assets\Admin\vendors\validator\README.md" />
     <Content Include="Areas\Admin\Views\Shared\_TopMenu.cshtml" />
+    <Content Include="Areas\Admin\Views\Tag\Create.cshtml" />
+    <Content Include="Areas\Admin\Views\Tag\Edit.cshtml" />
+    <Content Include="Areas\Admin\Views\Tag\Detail.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />

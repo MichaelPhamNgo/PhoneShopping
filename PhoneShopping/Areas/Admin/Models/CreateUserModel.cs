@@ -31,8 +31,6 @@ namespace PhoneShopping.Areas.Admin.Models
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { set; get; }
 
-        public DateTime? RegisteredDate { get; set; }
-
-        public bool IsAgree { set; get; }
+        public DateTime? RegisteredDate { get; set; }        
     }
 }

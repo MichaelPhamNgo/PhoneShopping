@@ -1,0 +1,112 @@
+﻿@model Models.ViewModel.TagModel
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Tag")">Tags</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Detail</li>
+    </ol>
+</nav>
+<div class="clearfix"></div>
+<div class="row">
+    <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>A Tag Detail </h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <br />
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Tag Id
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.Id
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Tag Name
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.TagName
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Tag Description
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.TagDescription
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Creator
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.Creator
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Created Date
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @(Model.CreatedDate.HasValue ? Model.CreatedDate.Value.ToString("MM/dd/yyyy HH:mm:ss") : "")
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Modifier
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @if (!string.IsNullOrEmpty(Model.Modifier))
+                        {
+                            @Model.Modifier;
+                        }
+                        else
+                        {
+                            @:Wating for update
+                        }
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Modified Date
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @if (Model.ModifiedDate.HasValue)
+                        {
+                            @Model.ModifiedDate.Value.ToString("MM/dd/yyyy HH:mm:ss");
+                        }
+                        else
+                        {
+                            @:Wating for update
+                        }                        
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Status
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @((bool)Model.Status? "Processing" : "Blocked")
+                    </div>
+                </div>
+                <div class="ln_solid"></div>
+                <p>
+                    @Html.ActionLink("Back to tag index", "Index", "Tag")
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+

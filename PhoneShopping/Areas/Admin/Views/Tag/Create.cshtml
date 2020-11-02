@@ -1,0 +1,78 @@
+﻿@model Models.EF.Tag
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Tag")">Tags</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Create</li>
+    </ol>
+</nav>
+<div class="clearfix"></div>
+<div class="row">
+    <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Create A New Tag</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <br />
+                @using (Html.BeginForm("Create", "Tag", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    if (!(ViewBag.AddTagSuccessMessage == null))
+                    {
+                        <div class="row form-group">
+                            <div class="col-12">
+                                <div class="alert alert-success" role="alert">@ViewBag.AddTagSuccessMessage</div>
+                            </div>
+                        </div>
+                    }
+                    if (!(ViewBag.AddTagErrorMessage == null))
+                    {
+                        <div class="row form-group">
+                            <div class="col-12">
+                                <div class="alert alert-danger" role="alert">@ViewBag.AddTagErrorMessage</div>
+                            </div>
+                        </div>
+                    }
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">
+                            Tag Name <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 ">
+                            @Html.TextBoxFor(model => model.TagName, null, new { @class = "form-control", @placeholder = "Tag Name", @autofocus = "autofocus" })
+                            <small class="form-text text-muted">@Html.ValidationMessageFor(model => model.TagName, "", new { @class = "text-danger" })</small>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">
+                            Tag Description
+                        </label>
+                        <div class="col-md-6 col-sm-6 ">
+                            @Html.TextAreaFor(model => model.TagDescription, new { @class = "form-control", @placeholder = "Tag Description" })
+                            <small class="form-text text-muted">@Html.ValidationMessageFor(model => model.TagDescription, "", new { @class = "text-danger" })</small>
+                        </div>
+                    </div>
+                    <div class="ln_solid"></div>
+                    <div class="item form-group">
+                        <div class="col-md-6 col-sm-6 offset-md-3">
+                            <button type="submit" class="btn btn-success">Submit</button>
+                            <button class="btn btn-primary" type="reset">Reset</button>
+                        </div>
+                    </div>
+                    <div class="ln_solid"></div>
+                }
+                <p>
+                    @Html.ActionLink("Back to tag index", "Index", "Tag")
+                </p>
+            </div>            
+        </div>        
+    </div>
+</div>

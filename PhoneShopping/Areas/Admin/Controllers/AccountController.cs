@@ -23,16 +23,22 @@ namespace PhoneShopping.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                var model = new UserDao();
+                var dao = new UserDao();
 
-                var getUser = model.getUserByEmail(user.Email);
+                var getUser = dao.getUserByEmail(user.Email);
 
                 string securityStamp = getUser.SecurityStamp;
                 string password = getUser.Password;
                 string comparePassword = Helper.EncodePassword(user.Password, securityStamp);
 
                 if (password.Equals(comparePassword))
-                {
+                {                    
+                    var userSession = new UserLogin();
+                    userSession.UserId = getUser.Id;
+                    userSession.UserName = getUser.UserName;
+                    userSession.Email = getUser.Email;
+
+                    Session.Add(CommonConstants.USER_SESSION, userSession);
                     return RedirectToAction("Index", "Home");
                 } else
                 {
@@ -50,24 +56,16 @@ namespace PhoneShopping.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Create(CreateUserModel user)
         {
-            var model = new UserDao();
-
-            if (user.IsAgree == false)
-            {
-                //check Agree terms and policy
-                ModelState.AddModelError("", "Please agree the terms and policy.");
-                ViewBag.AccountCreateErrorMessage = "Please agree the terms and policy.";
-            }
-
+            var dao = new UserDao();
             
-            var getUserByEmail = model.getUserByEmail(user.Email);            
+            var getUserByEmail = dao.getUserByEmail(user.Email);            
             if (getUserByEmail != null)
             {
                 ModelState.AddModelError("", "Email account exists in database.");
                 ViewBag.AccountEmailCreateExistErrorMessage = "Email exists in database.";
             }
 
-            var getUserByUsername = model.getUserByEmail(user.UserName);
+            var getUserByUsername = dao.getUserByEmail(user.UserName);
             if (getUserByUsername != null)
             {
                 ModelState.AddModelError("", "Username exists in database.");
@@ -83,7 +81,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
                 entity.Password = Helper.EncodePassword(user.Password, entity.SecurityStamp);
                 entity.RegisteredDate = DateTime.UtcNow;
                 entity.Status = true;
-                long id = model.CreateUser(entity);
+                long id = dao.CreateUser(entity);
                 if(id > 0)
                 {
                    return RedirectToAction("Login", "Account");

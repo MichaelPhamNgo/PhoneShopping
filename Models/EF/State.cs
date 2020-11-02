@@ -9,7 +9,7 @@ namespace Models.EF
     [Table("State")]
     public partial class State
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        [Key]
         public long Id { get; set; }
 
         [StringLength(50)]

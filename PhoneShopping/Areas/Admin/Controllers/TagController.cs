@@ -119,7 +119,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
             if(getTag != null)
             {
                 ModelState.AddModelError("", "Tag name exists in database.");
-                ViewBag.AddTagErrorMessage = tag.TagName + " exists in database.";
+                TempData["CreateTagErrorMessage"] = tag.TagName + " exists in database.";
             }
 
             if(ModelState.IsValid)
@@ -133,11 +133,11 @@ namespace PhoneShopping.Areas.Admin.Controllers
                 long id = dao.CreateTag(entity);
                 if (id > 0)
                 {
-                    ViewBag.AddTagSuccessMessage = "Create " + tag.TagName + " Successful";
+                    TempData["CreateTagSuccessMessage"] = "Create " + tag.TagName + " Successful";
                 }
                 else
                 {
-                    ViewBag.AddTagErrorMessage = "Create " + tag.TagName + " failed";
+                    TempData["CreateTagErrorMessage"] = "Create " + tag.TagName + " failed";
                 }
             }            
             return View(tag);            
@@ -150,12 +150,9 @@ namespace PhoneShopping.Areas.Admin.Controllers
         /// <returns></returns>
         public ActionResult Edit(long? id)
         {
-            ViewBag.SuccessMessage = TempData["SuccessMessage"] as string;
-            ViewBag.ErrorMessage = TempData["ErrorMessage"] as string;
-
             if (id == null)
             {
-                TempData["ErrorMessage"] = "URL does not exist!";
+                TempData["EditTagErrorMessage"] = "URL does not exist!";
                 return RedirectToAction("Index", "Tag");
             }
             else
@@ -164,7 +161,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
                 var tag = dao.GetById(id);
                 if (tag == null)
                 {
-                    TempData["ErrorMessage"] = "Tag " + id + " does not exist!";
+                    TempData["EditTagErrorMessage"] = "TAG ID = " + id + " does not exist!";
                     return RedirectToAction("Index", "Tag");
                 }
                 else
@@ -182,26 +179,28 @@ namespace PhoneShopping.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Edit(Tag tag)
         {
-            //Gọi lớp Models/Dao/CategoryDao.cs
+            //Gọi lớp Models/Dao/TagDao.cs
             var dao = new TagDao();
 
-            //Kiểm tra sự tồn tại của category id
+            //Kiểm tra sự tồn tại của tag id. Do update nên id phải tồn tại.
             var checkExistTag = dao.GetById(tag.Id);
             if (checkExistTag == null)
             {
-                ModelState.AddModelError("ErrorMessage", "Update tag failed.");
+                TempData["EditTagErrorMessage"] = "Update TAG failed.";
+                ModelState.AddModelError("", "Update tag failed.");
             }
             
-            //Kiểm tra trường hợp nếu lưu category name mới. Nếu đã tồi tại rồi thì thông báo
+            //Kiểm tra trường hợp nếu lưu tag name mới. Nếu đã tồi tại rồi thì thông báo
             if (!tag.TagName.Equals(checkExistTag.TagName))
             {
-                //Truy xuất dữ liệu category name
+                //Truy xuất dữ liệu tag name
                 var tagDetail = dao.getTagByName(tag.TagName);
 
-                //Nếu category name đã tồn tại thì báo lỗi
+                //Nếu tag name đã tồn tại thì báo lỗi
                 if (tagDetail != null)
                 {
-                    ModelState.AddModelError("Name", "The tag name exists in database.");
+                    TempData["EditTagErrorMessage"] = "The TAG NAME = " + tag.TagName + " exists in database.";
+                    ModelState.AddModelError("", "The tag name exists in database.");
                 }
             }
             
@@ -209,24 +208,24 @@ namespace PhoneShopping.Areas.Admin.Controllers
             if (ModelState.IsValid)
             {
                 var entity = new Tag();
-
+                entity.Id = tag.Id;
                 entity.TagName = tag.TagName;
                 entity.TagDescription = tag.TagDescription;
                 entity.ModifiedDate = DateTime.UtcNow;
-                //Lưu lại người tạo mới một category
+                //Lưu lại người tạo mới một tag
                 entity.ModifiedBy = ((UserLogin)Session[CommonConstants.USER_SESSION]).UserId;
-                //Lưu category vào hệ thống
+                //Lưu tag vào hệ thống
                 bool update = dao.UpdateTag(entity);
-                //Lưu cateogry vào hệ thống thành công
+                //Lưu tag vào hệ thống thành công
                 if (update)
                 {
-                    TempData["SuccessMessage"] = "Update Category Successful";
-                    return RedirectToAction("Edit", "Category", new RouteValueDictionary(new { id = tag.Id }));
+                    TempData["EditTagSuccessMessage"] = "Update TAG Successful";
+                    return RedirectToAction("Edit", "Tag", new RouteValueDictionary(new { id = tag.Id }));
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = "Update Category failed";
-                    return RedirectToAction("Edit", "Category", new RouteValueDictionary(new { id = tag.Id }));
+                    TempData["EditTagErrorMessage"] = "Update TAG failed";
+                    return RedirectToAction("Edit", "Tag", new RouteValueDictionary(new { id = tag.Id }));
                 }
             }
             return View(tag);
@@ -258,7 +257,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
         public JsonResult ChangeStatus(long? id)
         {
             var result = new TagDao().ChangeTagStatus(id);
-            return Json(new { status = result });
+            return Json(new { status = result });           
         }
 
         /// <summary>
@@ -269,31 +268,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
         [HttpDelete]
         public ActionResult Delete(long? id)
         {
-            var dao = new TagDao();
-            //Check if tag id = null
-            if (id == null)
-            {
-                Response.StatusCode = 404;
-                return View("NotFound");
-            }
-            else 
-            { 
-                //Check if tag id does not exist in database
-                if(dao.GetById(id) == null)
-                {
-                    Response.StatusCode = 404;
-                    return View("NotFound");
-                } 
-                else
-                {
-                    var model = dao.DeleteTag(id);
-                    if (!model)
-                    {
-                        Response.StatusCode = 404;
-                        return View("NotFound");
-                    }
-                }
-            }
+            var dao = new TagDao().DeleteTag(id);                     
             return RedirectToAction("Index");
         }
     }

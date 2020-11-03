@@ -1,8 +1,77 @@
-﻿
+﻿@model Models.EF.Tag
+
 @{
     ViewBag.Title = "Edit";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit</h2>
+@section scripts {
+    <script src="/Assets/Admin/build/js/toastr.min.js"></script>
+    <script>
+        @if (TempData.ContainsKey("EditTagErrorMessage"))
+        {
+            <text>$(document).ready(function () { toastr.error('@TempData["EditTagErrorMessage"]'); });</text>
+        }
 
+        @if (TempData.ContainsKey("EditTagSuccessMessage"))
+        {
+            <text>$(document).ready(function () { toastr.success('@TempData["EditTagSuccessMessage"]'); });</text>
+        }
+    </script>
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Tag")">Tags</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Edit</li>
+    </ol>
+</nav>
+<div class="clearfix"></div>
+<div class="row">
+    <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Edit A Tag</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <br />
+                @using (Html.BeginForm("Edit", "Tag", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.HiddenFor(model => model.Id)
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">
+                            Tag Name <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 ">
+                            @Html.TextBoxFor(model => model.TagName, null, new { @class = "form-control", @placeholder = "Tag Name", @autofocus = "autofocus" })
+                            <small class="form-text text-muted">@Html.ValidationMessageFor(model => model.TagName, "", new { @class = "text-danger" })</small>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">
+                            Tag Description
+                        </label>
+                        <div class="col-md-6 col-sm-6 ">
+                            @Html.TextAreaFor(model => model.TagDescription, new { @class = "form-control", @placeholder = "Tag Description" })
+                            <small class="form-text text-muted">@Html.ValidationMessageFor(model => model.TagDescription, "", new { @class = "text-danger" })</small>
+                        </div>
+                    </div>
+                    <div class="ln_solid"></div>
+                    <div class="item form-group">
+                        <div class="col-md-6 col-sm-6 offset-md-3">
+                            <button type="submit" class="btn btn-success">Submit</button>
+                            <button class="btn btn-primary" type="reset">Reset</button>
+                        </div>
+                    </div>
+                    <div class="ln_solid"></div>
+                }
+                <p>
+                    @Html.ActionLink("Back to tag index", "Index", "Tag")
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

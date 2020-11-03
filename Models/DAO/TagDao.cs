@@ -271,10 +271,17 @@ namespace Models.DAO
 
         public bool ChangeTagStatus(long? id)
         {
-            var tag = db.Tags.Find(id);
-            tag.Status = !tag.Status;
-            db.SaveChanges();
-            return (bool)tag.Status;
+            try
+            {
+                var tag = db.Tags.Find(id);
+                tag.Status = !tag.Status;
+                db.SaveChanges();
+                return (bool)tag.Status;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public bool DeleteTag(long? id)
@@ -291,6 +298,6 @@ namespace Models.DAO
                 return false;
             }
 
-        }
+        }        
     }
 }

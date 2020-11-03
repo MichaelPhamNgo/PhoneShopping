@@ -5,6 +5,21 @@
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
+@section scripts {    
+    <script src="/Assets/Admin/build/js/toastr.min.js"></script>    
+    <script>
+        @if (TempData.ContainsKey("CreateTagErrorMessage"))
+        {
+            <text>$(document).ready(function () { toastr.error('@TempData["CreateTagErrorMessage"]'); });</text>
+        }
+
+        @if (TempData.ContainsKey("CreateTagSuccessMessage"))
+        {
+            <text>$(document).ready(function () { toastr.success('@TempData["CreateTagSuccessMessage"]'); });</text>
+        }
+    </script>
+}
+
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
@@ -24,24 +39,7 @@
                 <br />
                 @using (Html.BeginForm("Create", "Tag", FormMethod.Post, new { @class = "form-horizontal" }))
                 {
-                    @Html.AntiForgeryToken()
-
-                    if (!(ViewBag.AddTagSuccessMessage == null))
-                    {
-                        <div class="row form-group">
-                            <div class="col-12">
-                                <div class="alert alert-success" role="alert">@ViewBag.AddTagSuccessMessage</div>
-                            </div>
-                        </div>
-                    }
-                    if (!(ViewBag.AddTagErrorMessage == null))
-                    {
-                        <div class="row form-group">
-                            <div class="col-12">
-                                <div class="alert alert-danger" role="alert">@ViewBag.AddTagErrorMessage</div>
-                            </div>
-                        </div>
-                    }
+                    @Html.AntiForgeryToken()                   
                     <div class="item form-group">
                         <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">
                             Tag Name <span class="required">*</span>
@@ -72,7 +70,7 @@
                 <p>
                     @Html.ActionLink("Back to tag index", "Index", "Tag")
                 </p>
-            </div>            
-        </div>        
+            </div>
+        </div>
     </div>
 </div>

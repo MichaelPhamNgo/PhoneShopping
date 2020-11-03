@@ -13,7 +13,8 @@
                 dataType: "json",
                 type: "POST",
                 success: function (response) {
-                    console.log(response)
+                    console.log(response);
+                    toastr.success("Change status success.")
                     if (response.status == true) {
                         status.text("Processing");
                     } else {

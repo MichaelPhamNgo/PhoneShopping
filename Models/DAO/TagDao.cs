@@ -22,8 +22,13 @@ namespace Models.DAO
             return db.Tags.Where(tag => tag.TagName.Equals(TagName)).SingleOrDefault();
         }
 
-        public TagModel GetById(long? Id)
+        public Tag GetById(long? Id)
         {
+            return db.Tags.Where(tag => tag.Id == Id).SingleOrDefault();
+        }
+
+        public TagModel GetJoinUserById(long? Id)
+        {            
             var sql = db.Tags.Where(tag => tag.Id == Id).SingleOrDefault();
             if (sql.ModifiedBy == null)
             {

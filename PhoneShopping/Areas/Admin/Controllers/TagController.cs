@@ -10,9 +10,22 @@ using System.Web.Routing;
 
 namespace PhoneShopping.Areas.Admin.Controllers
 {
+    [HandleError]
     public class TagController : BaseController
     {
-        // GET: Admin/Tag
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="searchTagName"></param>
+        /// <param name="searchTagCreator"></param>
+        /// <param name="searchTagCreatedDateFrom"></param>
+        /// <param name="searchTagCreatedDateTo"></param>
+        /// <param name="searchTagStatus"></param>
+        /// <param name="sortByType"></param>
+        /// <param name="sorting"></param>
+        /// <param name="searchPageSize"></param>
+        /// <param name="searchPage"></param>
+        /// <returns></returns>
         public ActionResult Index(string searchTagName, string searchTagCreator,
                                     string searchTagCreatedDateFrom, string searchTagCreatedDateTo, 
                                     string searchTagStatus, string sortByType = "createdDate",
@@ -56,34 +69,56 @@ namespace PhoneShopping.Areas.Admin.Controllers
             return View(model);
         }        
 
-        // GET: Admin/Tag/Details/5
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult Detail(long? id)
         {
-            if(id == null)
+            var dao = new TagDao();
+            //check if id = null
+            if (id == null)
             {
-                return RedirectToAction("Index","Tag");
-            }else
+                Response.StatusCode = 404;
+                return View("NotFound");                             
+            }
+            
+            //check if id does not exist in database
+            if (dao.GetById(id) == null)
             {
-                var dao = new TagDao();
-                return View(dao.GetById(id));
+                Response.StatusCode = 404;
+                return View("NotFound");
+            } else
+            {
+                return View(dao.GetJoinUserById(id));
             }            
         }
 
-        // GET: Admin/Tag/Create
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public ActionResult Create()
         {            
             return View();
         }
 
-        // POST: Admin/Tag/Create
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Create(Tag tag)
         {           
             var dao = new TagDao();
             var getTag = dao.getTagByName(tag.TagName);
+
+            //Check if tag name exits in database
             if(getTag != null)
             {
-                ModelState.AddModelError("", "Email account exists in database.");
+                ModelState.AddModelError("", "Tag name exists in database.");
                 ViewBag.AddTagErrorMessage = tag.TagName + " exists in database.";
             }
 
@@ -108,7 +143,11 @@ namespace PhoneShopping.Areas.Admin.Controllers
             return View(tag);            
         }
 
-        // GET: Admin/Tag/Edit/5
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public ActionResult Edit(long? id)
         {
             ViewBag.SuccessMessage = TempData["SuccessMessage"] as string;
@@ -135,7 +174,11 @@ namespace PhoneShopping.Areas.Admin.Controllers
             }
         }
 
-        // POST: Admin/Tag/Edit/5
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult Edit(Tag tag)
         {
@@ -189,6 +232,11 @@ namespace PhoneShopping.Areas.Admin.Controllers
             return View(tag);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="UserName"></param>
+        /// <returns></returns>
         [HttpPost]
         public JsonResult GetCreatorByUserName(string UserName)
         {
@@ -201,6 +249,11 @@ namespace PhoneShopping.Areas.Admin.Controllers
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpPost]
         public JsonResult ChangeStatus(long? id)
         {
@@ -208,18 +261,38 @@ namespace PhoneShopping.Areas.Admin.Controllers
             return Json(new { status = result });
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete]
         public ActionResult Delete(long? id)
         {
             var dao = new TagDao();
-            var delSuccess = dao.DeleteTag(id);
-            if (delSuccess)
+            //Check if tag id = null
+            if (id == null)
             {
-                TempData["DeleteCategorySuccessMessage"] = "Delete category successful";
+                Response.StatusCode = 404;
+                return View("NotFound");
             }
-            else
-            {
-                TempData["DeleteCategoryErrorMessage"] = "Delete category failed";
+            else 
+            { 
+                //Check if tag id does not exist in database
+                if(dao.GetById(id) == null)
+                {
+                    Response.StatusCode = 404;
+                    return View("NotFound");
+                } 
+                else
+                {
+                    var model = dao.DeleteTag(id);
+                    if (!model)
+                    {
+                        Response.StatusCode = 404;
+                        return View("NotFound");
+                    }
+                }
             }
             return RedirectToAction("Index");
         }

@@ -8,6 +8,7 @@
 
 @section scripts {
     <script src="/Assets/Admin/build/js/jquery-ui.min.js"></script>
+    <script src="/Assets/Admin/build/js/toastr.min.js"></script>
     <script src="/Assets/Admin/build/js/controller/tagController.js"></script>
     <script>
         $(document).ready(function () {
@@ -30,7 +31,16 @@
             $("#check-all").click(function () {
                 $(".checkBoxClass").prop('checked', $(this).prop('checked'));
             });
+            //$(".alert").fadeTo(4000, 500).slideUp(500, function () {
+            //    $(".alert").slideUp(500);
+            //});
         });
+    </script>
+    <script>
+        @if (TempData.ContainsKey("FindTagDetailErrorMessage"))
+        {
+            <text>$(document).ready(function () { toastr.error('@TempData["FindTagDetailErrorMessage"]'); });</text>
+        }        
     </script>
 }
 
@@ -143,13 +153,20 @@
                                                         <td style="text-align: center;">
                                                             <input type="checkbox" class="checkBoxClass" id="Checkbox_@item.Id">
                                                         </td>
-                                                        <td style="text-align:center;"><a href="/Admin/Tag/Detail/@item.Id">@item.TagName</a></td>
-                                                        <td style="text-align:center;"><a href="/Admin/Tag/Detail/@item.Id">@item.Creator</a></td>
-                                                        <td style="text-align:center;"><a href="/Admin/Tag/Detail/@item.Id">@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("MM/dd/yyyy HH:mm:ss") : "")</a></td>
+                                                        <td style="text-align:center;">@item.TagName</td>
+                                                        <td style="text-align:center;">@item.Creator</td>
+                                                        <td style="text-align:center;">@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("MM/dd/yyyy HH:mm:ss") : "")</td>
                                                         <td style="text-align:center;"><a class="btn-active" data-id="@item.Id">@((bool)item.Status? "Processing" : "Blocked")</a></td>
                                                         <td style="text-align:center;">
-                                                            <a href="/Admin/Tag/Edit/@item.Id"><span class="glyphicon glyphicon-edit"></span></a> |
-                                                            <a data-ajax="true" data-ajax-complete="$('#row_@item.Id').remove()" data-ajax-confirm="Are you sure to change status of this category" data-ajax-method="Delete" href="/Admin/Tag/Delete/@item.Id"><span class="glyphicon glyphicon-trash"></span></a>
+                                                            <a href="/Admin/Tag/Detail/@item.Id"><span class="glyphicon glyphicon-eye-open"></span> Detail</a> |
+                                                            <a href="/Admin/Tag/Edit/@item.Id"><span class="glyphicon glyphicon-edit"></span> Edit</a> |
+                                                            <a data-ajax="true" data-ajax-complete="$('#row_@item.Id').remove()" data-ajax-confirm="Are you sure to change status of this tag" data-ajax-method="Delete" href="/Admin/Tag/Delete/@item.Id"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+                                                            @*@Ajax.ActionLink("Delete", "Tag", new { @id = item.Id }, new AjaxOptions
+                                                            {
+                                                               Confirm = "Are you sure to change status of this category",
+                                                               OnComplete = "$('#row_" + item.Id + "').remove()",
+                                                               HttpMethod = "Delete"
+                                                            })*@
                                                         </td>
                                                     </tr>
                                                 }
@@ -168,13 +185,13 @@
                                             <div class="dataTables_paginate paging_simple_numbers" id="datatable_paginate">
                                                 @Html.PagedListPager(Model, searchPage => Url.Action("Index", new
                                                 {
-                                                                               searchPage,
+                                                                                searchPage,
                                                     searchTagName = ViewBag.SearchTagName,
-                                                                               searchTagCreator = ViewBag.SearchTagCreator,
-                                                                               searchTagCreatedDateFrom = ViewBag.SearchTagDateFrom,
-                                                                               searchTagCreatedDateTo = ViewBag.SearchTagDateTo,
-                                                                               searchTagStatus = ViewBag.SearchTagStatus,
-                                                                               searchPageSize = ViewBag.SearchTagPageSize
+                                                                                searchTagCreator = ViewBag.SearchTagCreator,
+                                                                                searchTagCreatedDateFrom = ViewBag.SearchTagDateFrom,
+                                                                                searchTagCreatedDateTo = ViewBag.SearchTagDateTo,
+                                                                                searchTagStatus = ViewBag.SearchTagStatus,
+                                                                                searchPageSize = ViewBag.SearchTagPageSize
                                                                         }))
                                             </div>
                                         </div>

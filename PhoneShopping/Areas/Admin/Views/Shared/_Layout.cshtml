@@ -22,6 +22,8 @@
     <link href="/Assets/Admin/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet" />
     <link href="/Assets/Admin/build/css/dataTables.bootstrap4.min.css" rel="stylesheet" />
     <link href="/Assets/Admin/build/css/jquery-ui.min.css" rel="stylesheet" />
+    <link href="~/Assets/Admin/build/css/toastr.css" rel="stylesheet" />
+
     <!-- Custom Theme Style -->
     <link href="/Assets/Admin/build/css/custom.css" rel="stylesheet">
 </head>
@@ -35,13 +37,13 @@
 
             <!-- top navigation -->
             <div class="top_nav">
-                @RenderPage("_TopMenu.cshtml")                
+                @RenderPage("_TopMenu.cshtml")
             </div>
             <!-- /top navigation -->
             <!-- page content -->
             <div class="right_col" role="main">
                 <div class="">
-                    @RenderBody()                    
+                    @RenderBody()
                 </div>
             </div>
             <!-- /page content -->
@@ -66,9 +68,10 @@
     <script src="/Assets/Admin/vendors/nprogress/nprogress.js"></script>
     <!-- jQuery custom content scroller -->
     <script src="/Assets/Admin/vendors/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
-
+    <script src="/Scripts/jquery.unobtrusive-ajax.min.js"></script>    
     <!-- Custom Theme Scripts -->
     <script src="/Assets/Admin/build/js/custom.min.js"></script>
+    @*<script src="/Assets/Admin/action.js"></script>*@
     @RenderSection("scripts", false)
 </body>
 </html>

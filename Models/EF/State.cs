@@ -9,9 +9,9 @@ namespace Models.EF
     [Table("State")]
     public partial class State
     {
-        [Key]
         public long Id { get; set; }
 
+        [Required]
         [StringLength(50)]
         public string StateName { get; set; }
 
@@ -20,11 +20,11 @@ namespace Models.EF
 
         public DateTime? CreatedDate { get; set; }
 
-        public long? CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
 
-        public long? ModifiedBy { get; set; }
+        public Guid? ModifiedBy { get; set; }
 
         public bool? Status { get; set; }
     }

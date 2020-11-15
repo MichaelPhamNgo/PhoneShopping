@@ -14,29 +14,29 @@ namespace Models.EF
         [StringLength(250)]
         public string ProductCategoryName { get; set; }
 
-        [StringLength(250)]
-        public string MetaTitle { get; set; }
-
         public long? ParentId { get; set; }
 
         public int? DisplayOrder { get; set; }
 
         [StringLength(250)]
-        public string SeoTitle { get; set; }
-
-        public DateTime? CreatedDate { get; set; }
-
-        public long? CreatedBy { get; set; }
-
-        public DateTime? ModifiedDate { get; set; }
-
-        public long? ModifiedBy { get; set; }
+        public string SeoKeywords { get; set; }
 
         [StringLength(250)]
-        public string MetaKeywords { get; set; }
+        public string SeoAlias { get; set; }
+
+        [StringLength(50)]
+        public string MetaTitle { get; set; }
 
         [StringLength(250)]
         public string MetaDescription { get; set; }
+
+        public DateTime? CreatedDate { get; set; }
+
+        public Guid? CreatedBy { get; set; }
+
+        public DateTime? ModifiedDate { get; set; }
+
+        public Guid? ModifiedBy { get; set; }
 
         public bool Status { get; set; }
 

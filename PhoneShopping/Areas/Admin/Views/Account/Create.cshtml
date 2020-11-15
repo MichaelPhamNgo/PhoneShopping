@@ -33,6 +33,7 @@
                 <section class="login_content">
                     @using (Html.BeginForm("Create", "Account", FormMethod.Post))
                     {
+                        @Html.AntiForgeryToken()
                         <h1>Create Account</h1>
                         <span class="text-danger">@ViewBag.CreateANewAccountFailedErrorMessage</span>
                         <div>
@@ -65,7 +66,7 @@
                                 <a href="@Url.Action("Login", "Account")" class="to_register"> Log in </a>
                             </p>
 
-                            <div class="clearfix"></div>                            
+                            <div class="clearfix"></div>
                         </div>
                     }
                 </section>

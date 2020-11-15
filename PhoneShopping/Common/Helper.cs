@@ -9,6 +9,12 @@ namespace PhoneShopping.Common
 {
     public static class Helper
     {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="relativeUrl"></param>
+        /// <returns></returns>
         public static string ToAbsoluteUrl(this string relativeUrl) //Use absolute URL instead of adding phycal path for CSS, JS and Images     
         {
             if (string.IsNullOrEmpty(relativeUrl)) return relativeUrl;
@@ -19,6 +25,12 @@ namespace PhoneShopping.Common
             var port = url.Port != 80 ? (":" + url.Port) : String.Empty;
             return String.Format("{0}://{1}{2}{3}", url.Scheme, url.Host, port, VirtualPathUtility.ToAbsolute(relativeUrl));
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="length"></param>
+        /// <returns></returns>
         public static string GeneratePassword(int length) //length of salt    
         {
             const string allowedChars = "abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNOPQRSTUVWXYZ0123456789";
@@ -31,6 +43,13 @@ namespace PhoneShopping.Common
             }
             return new string(chars);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pass"></param>
+        /// <param name="salt"></param>
+        /// <returns></returns>
         public static string EncodePassword(string pass, string salt) //encrypt password    
         {
             byte[] bytes = Encoding.Unicode.GetBytes(pass);
@@ -43,6 +62,12 @@ namespace PhoneShopping.Common
             //return Convert.ToBase64String(inArray);    
             return EncodePasswordMd5(Convert.ToBase64String(inArray));
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pass"></param>
+        /// <returns></returns>
         public static string EncodePasswordMd5(string pass) //Encrypt using MD5    
         {
             Byte[] originalBytes;
@@ -55,7 +80,13 @@ namespace PhoneShopping.Common
             //Convert encoded bytes back to a 'readable' string    
             return BitConverter.ToString(encodedBytes);
         }
-        public static string base64Encode(string sData) // Encode    
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sData"></param>
+        /// <returns></returns>
+        public static string base64Encode(string sData)
         {
             try
             {
@@ -69,7 +100,13 @@ namespace PhoneShopping.Common
                 throw new Exception("Error in base64Encode" + ex.Message);
             }
         }
-        public static string base64Decode(string sData) //Decode    
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sData"></param>
+        /// <returns></returns>
+        public static string base64Decode(string sData) 
         {
             try
             {
@@ -86,6 +123,39 @@ namespace PhoneShopping.Common
             {
                 throw new Exception("Error in base64Decode" + ex.Message);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="first"></param>
+        /// <param name="second"></param>
+        /// <returns></returns>
+        public static bool SameDate(DateTimeOffset first, DateTimeOffset second)
+        {
+            bool returnValue = false;
+            DateTime firstAdjusted = first.ToUniversalTime().Date;
+            DateTime secondAdjusted = second.ToUniversalTime().Date;
+
+            // calculate the total diference between the dates   
+            int diff = first.Date.CompareTo(firstAdjusted) - second.Date.CompareTo(secondAdjusted);
+            // the firstAdjusted date is corected for the difference in BOTH dates.
+            firstAdjusted = firstAdjusted.AddDays(diff);
+
+            if (DateTime.Compare(firstAdjusted, secondAdjusted) == 0)
+                returnValue = true;
+
+            return returnValue;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="current"></param>
+        /// <returns></returns>
+        public static DateTimeOffset nextDay(DateTimeOffset current)
+        {
+            return current.ToUniversalTime().Date.AddDays(1);
         }
     }
 }

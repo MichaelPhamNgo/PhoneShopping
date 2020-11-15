@@ -17,9 +17,9 @@ namespace Models.EF
         public virtual DbSet<Contact> Contacts { get; set; }
         public virtual DbSet<Content> Contents { get; set; }
         public virtual DbSet<ContentTag> ContentTags { get; set; }
-        public virtual DbSet<Credential> Credentials { get; set; }
         public virtual DbSet<Feedback> Feedbacks { get; set; }
         public virtual DbSet<Footer> Footers { get; set; }
+        public virtual DbSet<Function> Functions { get; set; }
         public virtual DbSet<Language> Languages { get; set; }
         public virtual DbSet<Menu> Menus { get; set; }
         public virtual DbSet<MenuType> MenuTypes { get; set; }
@@ -33,16 +33,21 @@ namespace Models.EF
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<User> Users { get; set; }
-        public virtual DbSet<UserGroup> UserGroups { get; set; }
+        public virtual DbSet<UserRole> UserRoles { get; set; }
+        public virtual DbSet<Permission> Permissions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<About>()
+                .Property(e => e.SeoAlias)
+                .IsUnicode(false);
+
             modelBuilder.Entity<About>()
                 .Property(e => e.MetaDescription)
                 .IsFixedLength();
 
             modelBuilder.Entity<Category>()
-                .Property(e => e.MetaTitle)
+                .Property(e => e.SeoAlias)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Category>()
@@ -51,6 +56,10 @@ namespace Models.EF
 
             modelBuilder.Entity<Category>()
                 .Property(e => e.Language)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Content>()
+                .Property(e => e.SeoAlias)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Content>()
@@ -63,14 +72,6 @@ namespace Models.EF
 
             modelBuilder.Entity<ContentTag>()
                 .Property(e => e.TagId)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<Credential>()
-                .Property(e => e.UserGroupId)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<Credential>()
-                .Property(e => e.RoleId)
                 .IsUnicode(false);
 
             modelBuilder.Entity<Footer>()
@@ -86,20 +87,20 @@ namespace Models.EF
                 .IsUnicode(false);
 
             modelBuilder.Entity<Product>()
+                .Property(e => e.SeoAlias)
+                .IsUnicode(false);
+
+            modelBuilder.Entity<Product>()
                 .Property(e => e.MetaDescription)
                 .IsFixedLength();
 
             modelBuilder.Entity<ProductCategory>()
-                .Property(e => e.MetaTitle)
+                .Property(e => e.SeoAlias)
                 .IsUnicode(false);
 
             modelBuilder.Entity<ProductCategory>()
                 .Property(e => e.MetaDescription)
                 .IsFixedLength();
-
-            modelBuilder.Entity<Role>()
-                .Property(e => e.Id)
-                .IsUnicode(false);
 
             modelBuilder.Entity<SystemConfig>()
                 .Property(e => e.Id)
@@ -111,14 +112,6 @@ namespace Models.EF
 
             modelBuilder.Entity<User>()
                 .Property(e => e.SecurityStamp)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<User>()
-                .Property(e => e.GroupId)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<UserGroup>()
-                .Property(e => e.Id)
                 .IsUnicode(false);
         }
     }

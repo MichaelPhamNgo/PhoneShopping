@@ -14,6 +14,7 @@ namespace PhoneShopping.Areas.Admin.Models
         public string Email { set; get; }
         [Required(ErrorMessage = "Please input password")]
         public string Password { set; get; }
+        public string CaptchaCode { get; set; }
         public bool RememberMe { set; get; }
     }
 }

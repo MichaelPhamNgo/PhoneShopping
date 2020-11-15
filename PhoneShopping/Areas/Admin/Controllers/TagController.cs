@@ -9,8 +9,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace PhoneShopping.Areas.Admin.Controllers
-{
-    [HandleError]
+{    
     public class TagController : BaseController
     {
         /// <summary>
@@ -268,7 +267,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
         [HttpDelete]
         public ActionResult Delete(long? id)
         {
-            var dao = new TagDao().DeleteTag(id);                     
+            new TagDao().DeleteTag(id);                     
             return RedirectToAction("Index");
         }
     }

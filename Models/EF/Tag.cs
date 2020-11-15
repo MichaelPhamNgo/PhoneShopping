@@ -9,12 +9,10 @@ namespace Models.EF
     [Table("Tag")]
     public partial class Tag
     {
-        [Key]
         public long Id { get; set; }
 
         [Required]
         [StringLength(50)]
-        [MinLength(3)]
         public string TagName { get; set; }
 
         [StringLength(250)]
@@ -22,11 +20,11 @@ namespace Models.EF
 
         public DateTime? CreatedDate { get; set; }
 
-        public long? CreatedBy { get; set; }
+        public Guid? CreatedBy { get; set; }
 
         public DateTime? ModifiedDate { get; set; }
 
-        public long? ModifiedBy { get; set; }
+        public Guid? ModifiedBy { get; set; }
 
         public bool? Status { get; set; }
     }

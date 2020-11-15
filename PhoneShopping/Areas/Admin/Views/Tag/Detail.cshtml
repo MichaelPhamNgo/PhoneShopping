@@ -52,7 +52,14 @@
                         Creator
                     </label>
                     <div class="col-md-6 col-sm-6 ">
-                        @Model.Creator
+                        @if (!string.IsNullOrEmpty(Model.Creator))
+                        {
+                            @Model.Creator;
+                        }
+                        else
+                        {
+                            @:Wating for update
+                        }
                     </div>
                 </div>
                 <div class="item form-group">
@@ -60,7 +67,14 @@
                         Created Date
                     </label>
                     <div class="col-md-6 col-sm-6 ">
-                        @(Model.CreatedDate.HasValue ? Model.CreatedDate.Value.ToString("MM/dd/yyyy HH:mm:ss") : "")
+                        @if (Model.CreatedDate.HasValue)
+                        {
+                            @Model.CreatedDate.Value.ToString("MM/dd/yyyy HH:mm:ss");
+                        }
+                        else
+                        {
+                            @:Wating for update
+                        }
                     </div>
                 </div>
                 <div class="item form-group">

@@ -29,31 +29,33 @@ namespace Models.DAO
 
         public TagModel GetJoinUserById(long? Id)
         {            
-            var sql = db.Tags.Where(tag => tag.Id == Id).SingleOrDefault();
-            if (sql.ModifiedBy == null)
-            {
+            //var sql = db.Tags.Where(tag => tag.Id == Id).SingleOrDefault();
+            //if (sql.ModifiedBy == null)
+            //{
+            //    return (from tag in db.Tags
+            //            join creator in db.Users
+            //            on tag.CreatedBy equals creator.Id
+            //            select new TagModel
+            //            {
+            //                Id = tag.Id,
+            //                TagName = tag.TagName,
+            //                TagDescription = tag.TagDescription,
+            //                CreatedDate = tag.CreatedDate,
+            //                Creator = creator.UserName,
+            //                ModifiedDate = null,
+            //                Modifier = null,
+            //                Status = tag.Status
+            //            }).Where(tag => tag.Id == Id).FirstOrDefault();
+            //} 
+            //else
+            //{
                 return (from tag in db.Tags
                         join creator in db.Users
-                        on tag.CreatedBy equals creator.Id
-                        select new TagModel
-                        {
-                            Id = tag.Id,
-                            TagName = tag.TagName,
-                            TagDescription = tag.TagDescription,
-                            CreatedDate = tag.CreatedDate,
-                            Creator = creator.UserName,
-                            ModifiedDate = null,
-                            Modifier = null,
-                            Status = tag.Status
-                        }).Where(tag => tag.Id == Id).FirstOrDefault();
-            } 
-            else
-            {
-                return (from tag in db.Tags
-                        join creator in db.Users
-                        on tag.CreatedBy equals creator.Id
+                        on tag.CreatedBy equals creator.Id into grpjoin_tag_creator 
+                        from creator in grpjoin_tag_creator.DefaultIfEmpty()
                         join modifier in db.Users
-                        on tag.ModifiedBy equals modifier.Id
+                        on tag.ModifiedBy equals modifier.Id into grpjoin_tag_modifier
+                        from modifier in grpjoin_tag_modifier.DefaultIfEmpty()
                         select new TagModel
                         {
                             Id = tag.Id,
@@ -65,7 +67,7 @@ namespace Models.DAO
                             Modifier = modifier.UserName,
                             Status = tag.Status
                         }).Where(tag => tag.Id == Id).FirstOrDefault();
-            }                    
+            //}                    
         }
 
         /// <summary>

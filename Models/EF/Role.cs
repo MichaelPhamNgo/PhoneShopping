@@ -9,10 +9,12 @@ namespace Models.EF
     [Table("Role")]
     public partial class Role
     {
-        [StringLength(50)]
-        public string Id { get; set; }
+        public Guid Id { get; set; }
 
-        [StringLength(50)]
+        [StringLength(100)]
         public string Name { get; set; }
+
+        [StringLength(250)]
+        public string Description { get; set; }
     }
 }

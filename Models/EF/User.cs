@@ -9,8 +9,7 @@ namespace Models.EF
     [Table("User")]
     public partial class User
     {
-        [Key]
-        public long Id { get; set; }
+        public Guid Id { get; set; }
 
         [StringLength(50)]
         public string UserName { get; set; }
@@ -33,7 +32,6 @@ namespace Models.EF
         [Column(TypeName = "date")]
         public DateTime? Dob { get; set; }
 
-        [Required]
         [StringLength(50)]
         public string Email { get; set; }
 
@@ -63,11 +61,15 @@ namespace Models.EF
 
         public DateTime? RegisteredDate { get; set; }
 
-        public DateTime? LastLoginDate { get; set; }
-
         public bool? Status { get; set; }
 
-        [StringLength(20)]
-        public string GroupId { get; set; }
+        public bool? LockoutEnabled { get; set; }
+
+        public DateTimeOffset? LockoutEnd { get; set; }
+
+        [StringLength(250)]
+        public string Avatar { get; set; }
+
+        public int? AccessFailedCount { get; set; }
     }
 }

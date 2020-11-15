@@ -6,13 +6,15 @@ namespace Models.EF
     using System.ComponentModel.DataAnnotations.Schema;
     using System.Data.Entity.Spatial;
 
-    [Table("UserGroup")]
-    public partial class UserGroup
+    [Table("UserRole")]
+    public partial class UserRole
     {
-        [StringLength(20)]
-        public string Id { get; set; }
+        [Key]
+        [Column(Order = 0)]
+        public Guid UserId { get; set; }
 
-        [StringLength(50)]
-        public string Name { get; set; }
+        [Key]
+        [Column(Order = 1)]
+        public Guid RoleId { get; set; }
     }
 }

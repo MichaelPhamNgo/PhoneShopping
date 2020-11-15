@@ -11,11 +11,7 @@ namespace PhoneShopping
     {
         public static void RegisterRoutes(RouteCollection routes)
         {
-            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-
-            // BotDetect requests must not be routed
-            routes.IgnoreRoute("{*botdetect}",
-              new { botdetect = @"(.*)BotDetectCaptcha\.ashx" });
+            routes.IgnoreRoute("{resource}.axd/{*pathInfo}");           
 
             routes.MapRoute(
                 name: "Default",

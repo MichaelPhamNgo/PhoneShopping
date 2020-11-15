@@ -1,12 +1,14 @@
-﻿using BotDetect.Web.Mvc;
-using Models.DAO;
+﻿using Models.DAO;
 using Models.EF;
+using Newtonsoft.Json.Linq;
 using PhoneShopping.Areas.Admin.Models;
 using PhoneShopping.Common;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Web;
 using System.Web.Mvc;
 
@@ -14,45 +16,62 @@ namespace PhoneShopping.Areas.Admin.Controllers
 {
     public class AccountController : Controller
     {
+        //References https://retifrav.github.io/blog/2017/08/23/dotnet-core-mvc-recaptcha/
+        public static bool ReCaptchaPassed(string gRecaptchaResponse, string secret)
+        {
+            HttpClient httpClient = new HttpClient();
+            var res = httpClient.GetAsync($"https://www.google.com/recaptcha/api/siteverify?secret={secret}&response={gRecaptchaResponse}").Result;
+            if (res.StatusCode != HttpStatusCode.OK)
+            {
+                //logger.LogError("Error while sending request to ReCaptcha");
+                return false;
+            }
+
+            string JSONres = res.Content.ReadAsStringAsync().Result;
+            dynamic JSONdata = JObject.Parse(JSONres);
+            if (JSONdata.success != "true")
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         // GET: Admin/Account
         public ActionResult Login()
         {            
             return View();
         }
 
-        [HttpPost]
+        [HttpPost]        
         public ActionResult Login(LoginModel user)
         {
-            //If user is trying to login over 3 times
-            if(TempData.ContainsKey("LoginFormDisplayCaptcha"))
-            {                
-                MvcCaptcha mvcCaptcha = new MvcCaptcha("CheckCaptcha");
-                if (mvcCaptcha.Validate(user.CaptchaCode))
-                {                    
-                    MvcCaptcha.ResetCaptcha("CheckCaptcha");
-                }
-                else
-                {
-                    ModelState.AddModelError("CaptchaCode", "Wrong Captcha!");
-                }
-            }
-
+            
             if (ModelState.IsValid)
             {
+                if(TempData.ContainsKey("ReCaptchaKey"))
+                {
+                    if (!ReCaptchaPassed(Request.Form["g-recaptcha-response"], ConfigurationManager.AppSettings["ReCaptcha.PrivateKey"].ToString()))
+                    {
+                        TempData["LoginFailedErrorMessage"] = "Your account is blocked";
+                        ModelState.AddModelError(string.Empty, "You failed the CAPTCHA, stupid robot. Go play some 1x1 on SFs instead.");
+                        return View(user);
+                    }
+                }                
                 var dao = new UserDao();
                 var getUser = dao.getUserByEmail(user.Email);
 
                 //If the email does not exist, show error messages
-                if(getUser == null)
+                if (getUser == null)
                 {
                     ModelState.AddModelError("Email", "Email account does not exist in database.");
-                } 
+                }
                 else
                 {
                     string securityStamp = getUser.SecurityStamp;
                     string password = getUser.Password;
                     string comparePassword = Helper.EncodePassword(user.Password, securityStamp);
-                    if(getUser.LockoutEnd == null || getUser.AccessFailedCount == null || getUser.LockoutEnabled == null)
+                    if (getUser.LockoutEnd == null || getUser.AccessFailedCount == null || getUser.LockoutEnabled == null)
                     {
                         //If password is not matched, reset and count the attempted login
                         if (password.Equals(comparePassword))
@@ -70,8 +89,9 @@ namespace PhoneShopping.Areas.Admin.Controllers
                             ModelState.AddModelError("Password", "Password does not exist in database.");
                             dao.resetCountAttemptedLogin(getUser.Id, 1, Helper.nextDay(DateTimeOffset.UtcNow), false);
                         }
-                        
-                    } else
+
+                    }
+                    else
                     {
                         DateTime logoutEnd = ((DateTimeOffset)getUser.LockoutEnd).ToUniversalTime().Date;
                         int acessFailedCount = (int)getUser.AccessFailedCount;
@@ -86,6 +106,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
                                 if (!password.Equals(comparePassword))
                                 {
                                     ModelState.AddModelError("Password", "Password does not exist in database.");
+                                    dao.resetCountAttemptedLogin(getUser.Id, 1, Helper.nextDay(DateTimeOffset.UtcNow), false);
                                 }
                                 else
                                 {
@@ -94,11 +115,11 @@ namespace PhoneShopping.Areas.Admin.Controllers
                                     userSession.UserName = getUser.UserName;
                                     userSession.Email = getUser.Email;
                                     Session.Add(CommonConstants.USER_SESSION, userSession);
-                                    TempData.Remove("LoginFormDisplayCaptcha");
+                                    TempData.Remove("ReCaptchaKey");
                                     TempData.Remove("LoginFailedErrorMessage");
+                                    dao.resetCountAttemptedLogin(getUser.Id, 1, Helper.nextDay(DateTimeOffset.UtcNow), false);
                                     return RedirectToAction("Index", "Home");
-                                }
-                                dao.resetCountAttemptedLogin(getUser.Id, 1, Helper.nextDay(DateTimeOffset.UtcNow), false);
+                                }                                
                             }
                             else
                             {
@@ -114,12 +135,12 @@ namespace PhoneShopping.Areas.Admin.Controllers
                                 int attemptLoginLock = int.Parse(ConfigurationManager.AppSettings["AttemptLoginLock"].ToString());
                                 if (acessFailedCount > attemptLoginCaptcha && acessFailedCount <= attemptLoginLock) //If number of login attempt exceeds 3, show captcha
                                 {
-                                    TempData["LoginFormDisplayCaptcha"] = "true";
+                                    TempData["ReCaptchaKey"] = ConfigurationManager.AppSettings["ReCaptcha.PublicKey"].ToString();
                                     dao.countUserAttempt(getUser.Id, acessFailedCount + 1);
                                 }
                                 else if (acessFailedCount > attemptLoginLock) //If number of login attempt exceeds 8, disable account a day
                                 {
-                                    TempData["LoginFormDisplayCaptcha"] = "true";
+                                    TempData["ReCaptchaKey"] = ConfigurationManager.AppSettings["ReCaptcha.PublicKey"].ToString();
                                     TempData["LoginFailedErrorMessage"] = "Your account is blocked";
                                     dao.disableAccount(getUser.Id, acessFailedCount + 1, true);
                                 }
@@ -134,13 +155,14 @@ namespace PhoneShopping.Areas.Admin.Controllers
                                 userSession.UserId = getUser.Id;
                                 userSession.UserName = getUser.UserName;
                                 userSession.Email = getUser.Email;
-                                TempData.Remove("LoginFormDisplayCaptcha");
+                                TempData.Remove("ReCaptchaKey");
                                 TempData.Remove("LoginFailedErrorMessage");
                                 Session.Add(CommonConstants.USER_SESSION, userSession);
+                                dao.resetCountAttemptedLogin(getUser.Id, 1, Helper.nextDay(DateTimeOffset.UtcNow), false);
                                 return RedirectToAction("Index", "Home");
                             }
                         }
-                    }                    
+                    }
                 }
             }
             return View(user);
@@ -151,44 +173,9 @@ namespace PhoneShopping.Areas.Admin.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost]        
         public ActionResult Create(CreateUserModel user)
-        {
-            var dao = new UserDao();
-            
-            var getUserByEmail = dao.getUserByEmail(user.Email);            
-            if (getUserByEmail != null)
-            {
-                ModelState.AddModelError("", "Email account exists in database.");
-                ViewBag.AccountEmailCreateExistErrorMessage = "Email exists in database.";
-            }
-
-            var getUserByUsername = dao.getUserByEmail(user.UserName);
-            if (getUserByUsername != null)
-            {
-                ModelState.AddModelError("", "Username exists in database.");
-                ViewBag.AccountUsernameCreateExistErrorMessage = "Username exists in database.";
-            }
-
-            if (ModelState.IsValid)
-            {
-                var entity = new User();
-                entity.Id = Guid.NewGuid();
-                entity.UserName = user.UserName;
-                entity.Email = user.Email;                
-                entity.SecurityStamp = Guid.NewGuid().ToString();
-                entity.Password = Helper.EncodePassword(user.Password, entity.SecurityStamp);
-                entity.RegisteredDate = DateTime.UtcNow;
-                entity.Status = true;
-                Guid id = dao.createUser(entity);
-                if(id != null)
-                {
-                   return RedirectToAction("Login", "Account");
-                } else
-                {
-                    ViewBag.CreateANewAccountFailedErrorMessage = "Create a new account failed.";                    
-                }
-            }
+        {            
             return View(user);
         }
 

@@ -1,8 +1,77 @@
-﻿
+﻿@model Models.EF.State
+
 @{
     ViewBag.Title = "Create";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Create</h2>
+@section scripts {
+    <script src="/Assets/Admin/build/js/toastr.min.js"></script>
+    <script>
+        @if (ViewBag.CreateRoleErrorMessage != null)
+        {
+            <text>$(document).ready(function () { toastr.error('@ViewBag.CreateRoleErrorMessage'); });</text>
+        }
+
+        @if (ViewBag.CreateRoleSuccessMessage != null)
+        {
+            <text>$(document).ready(function () { toastr.success('@ViewBag.CreateRoleSuccessMessage'); });</text>
+        }
+    </script>
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","State")">State</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Create</li>
+    </ol>
+</nav>
+<div class="clearfix"></div>
+<div class="row">
+    <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>Create A New State</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <br />
+                @using (Html.BeginForm("Create", "State", FormMethod.Post, new { @class = "form-horizontal" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">
+                            State Name <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6 col-sm-6 ">
+                            @Html.TextBoxFor(model => model.StateName, null, new { @class = "form-control", @placeholder = "State Name", @autofocus = "autofocus" })
+                            <small class="form-text text-muted">@Html.ValidationMessageFor(model => model.StateName, "", new { @class = "text-danger" })</small>
+                        </div>
+                    </div>
+                    <div class="item form-group">
+                        <label class="col-form-label col-md-3 col-sm-3 label-align" for="first-name">
+                            State Description
+                        </label>
+                        <div class="col-md-6 col-sm-6 ">
+                            @Html.TextAreaFor(model => model.StateDescription, new { @class = "form-control", @placeholder = "State Description" })
+                            <small class="form-text text-muted">@Html.ValidationMessageFor(model => model.StateDescription, "", new { @class = "text-danger" })</small>
+                        </div>
+                    </div>
+                    <div class="ln_solid"></div>
+                    <div class="item form-group">
+                        <div class="col-md-6 col-sm-6 offset-md-3">
+                            <button type="submit" class="btn btn-success">Submit</button>
+                            <a class="btn btn-primary" href="@Url.Action("Create","State")">Reset</a>
+                        </div>
+                    </div>
+                    <div class="ln_solid"></div>
+                }
+                <p>
+                    @Html.ActionLink("Back To State Index", "Index", "State")
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 

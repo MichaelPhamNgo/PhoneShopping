@@ -6,30 +6,9 @@
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-@section scripts {
-    <script src="/Assets/Admin/build/js/jquery-ui.min.js"></script>
+@section scripts {    
     <script src="/Assets/Admin/build/js/toastr.min.js"></script>
-    <script src="/Assets/Admin/build/js/controller/tagController.js"></script>
-    <script>
-        $(document).ready(function () {
-            $("#txtCreator").autocomplete({
-                source: function (request, response) {
-                    $.ajax({
-                        url: '@Url.Action("GetCreatorByUserName", "Tag")',
-                        dataType: "json",
-                        data: { UserName: $("#txtCreator").val() },
-                        type: "POST",
-                        success: function (data) {
-                            response($.map(data, function (item) {
-                                return item
-                            }))
-                        }
-                    })
-                },
-                minLength:1
-            });            
-        });
-    </script>
+    <script src="/Assets/Admin/build/js/controller/tagController.js"></script>    
     <script>
         @if (TempData.ContainsKey("EditTagErrorMessage"))
         {
@@ -37,7 +16,6 @@
         }        
     </script>
 }
-
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -53,8 +31,14 @@
     <div class="col-md-12 col-sm-12 ">
         <div class="x_panel">
             <div class="x_title">
-                <h2>Tag List</h2>
-                <div class="clearfix"></div>
+                <div class="row">
+                    <div class="col-md-6 col-sm-6">
+                        <h2 style=" margin-top: 9px;">Tag List</h2>
+                    </div>
+                    <div class="col-md-6 col-sm-6" style="text-align:right;">
+                        <a href="@Url.Action("Create", "Tag")" class="btn btn-success"><i class="fa fa-plus"></i> Add New</a>
+                    </div>
+                </div>    
             </div>
             <div class="x_content">
                 <div class="row">
@@ -62,101 +46,72 @@
                         <div class="card-box table-responsive">
                             <div id="datatable_wrapper" class="dataTables_wrapper container-fluid dt-bootstrap no-footer">
                                 <div class="row">
-                                    <div class="col-sm-6">
-                                        <a href="@Url.Action("Create", "Tag")" class="btn btn-default"><i class="fa fa-plus"></i> Add New</a>
+                                    <div class="col-sm-4 form-group pull-right top_search">
+                                        @using (Html.BeginForm("Index", "Tag", FormMethod.Get, new { @class = "form-horizontal" }))
+                                        {
+                                            <div class="input-group" style="margin-bottom:0px;">
+                                                <input type="text" name="searchString" class="form-control" placeholder="Search ..." value="@ViewBag.SearchString">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-default" type="submit">Go!</button>
+                                                </span>
+                                            </div>
+                                        }
                                     </div>
-                                    <div class="col-sm-6" style="text-align:right;margin-top:10px;">
-                                        <a href="/Admin/Tag?searchTagName=@ViewBag.SearchTagName&searchTagCreator=@ViewBag.SearchTagCreator&searchTagCreatedDateFrom=@ViewBag.SearchTagDateFrom&searchTagCreatedDateTo=@ViewBag.SearchTagDateTo&searchTagStatus=@ViewBag.SearchTagStatus&searchPageSize=10">10</a> |
-                                        <a href="/Admin/Tag?searchTagName=@ViewBag.SearchTagName&searchTagCreator=@ViewBag.SearchTagCreator&searchTagCreatedDateFrom=@ViewBag.SearchTagDateFrom&searchTagCreatedDateTo=@ViewBag.SearchTagDateTo&searchTagStatus=@ViewBag.SearchTagStatus&searchPageSize=20">20</a> |
-                                        <a href="/Admin/Tag?searchTagName=@ViewBag.SearchTagName&searchTagCreator=@ViewBag.SearchTagCreator&searchTagCreatedDateFrom=@ViewBag.SearchTagDateFrom&searchTagCreatedDateTo=@ViewBag.SearchTagDateTo&searchTagStatus=@ViewBag.SearchTagStatus&searchPageSize=50">50</a> |
-                                        <a href="/Admin/Tag?searchTagName=@ViewBag.SearchTagName&searchTagCreator=@ViewBag.SearchTagCreator&searchTagCreatedDateFrom=@ViewBag.SearchTagDateFrom&searchTagCreatedDateTo=@ViewBag.SearchTagDateTo&searchTagStatus=@ViewBag.SearchTagStatus&searchPageSize=100">100</a>
+                                    <div class="col-sm-8" style="text-align:right;margin-top:10px;">
+                                        <a href="/Admin/Tag?searchName=@ViewBag.SearchName&searchPageSize=10">10</a> |
+                                        <a href="/Admin/Tag?searchName=@ViewBag.SearchName&searchPageSize=20">20</a> |
+                                        <a href="/Admin/Tag?searchName=@ViewBag.SearchName&searchPageSize=50">50</a> |
+                                        <a href="/Admin/Tag?searchName=@ViewBag.SearchName&searchPageSize=100">100</a>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12">
                                         <table id="datatable" class="table table-striped table-bordered bulk_action dataTable no-footer" style="width: 100%;" role="grid" aria-describedby="datatable_info">
                                             <thead>
-                                                <tr role="row">                                                    
+                                                <tr role="row">
                                                     <th style="text-align: center;padding-right: 12px;">
-                                                        <a href="#">Tag ID</a>
+                                                        Tag ID
                                                     </th>
                                                     <th rowspan="1" colspan="1" style="text-align:center;">
-                                                        <a href="/Admin/Tag?searchTagName=@ViewBag.SearchTagName&searchTagCreator=@ViewBag.SearchTagCreator&searchTagCreatedDateFrom=@ViewBag.SearchTagDateFrom&searchTagCreatedDateTo=@ViewBag.SearchTagDateTo&searchTagStatus=@ViewBag.SearchTagStatus&sortByType=tagName&sorting=@ViewBag.Sorting&searchPageSize=@ViewBag.SearchTagPageSize">Tag Name</a>
+                                                        <a href="/Admin/Tag?searchName=@ViewBag.SearchName&sortByType=tagName&sorting=@ViewBag.Sorting&searchPageSize=@ViewBag.SearchTagPageSize">Tag Name</a>
                                                     </th>
                                                     <th rowspan="1" colspan="1" style="text-align:center;">
-                                                        <a href="/Admin/Tag?searchTagName=@ViewBag.SearchTagName&searchTagCreator=@ViewBag.SearchTagCreator&searchTagCreatedDateFrom=@ViewBag.SearchTagDateFrom&searchTagCreatedDateTo=@ViewBag.SearchTagDateTo&searchTagStatus=@ViewBag.SearchTagStatus&sortByType=creator&sorting=@ViewBag.Sorting&searchPageSize=@ViewBag.SearchTagPageSize">Creator</a>
+                                                        <a href="/Admin/Tag?searchName=@ViewBag.SearchName&sortByType=creator&sorting=@ViewBag.Sorting&searchPageSize=@ViewBag.SearchTagPageSize">Creator</a>
                                                     </th>
                                                     <th rowspan="1" colspan="1" style="text-align:center;">
-                                                        <a href="/Admin/Tag?searchTagName=@ViewBag.SearchTagName&searchTagCreator=@ViewBag.SearchTagCreator&searchTagCreatedDateFrom=@ViewBag.SearchTagDateFrom&searchTagCreatedDateTo=@ViewBag.SearchTagDateTo&searchTagStatus=@ViewBag.SearchTagStatus&sortByType=createdDate&sorting=@ViewBag.Sorting&searchPageSize=@ViewBag.SearchTagPageSize">Created Date</a>
+                                                        <a href="/Admin/Tag?searchName=@ViewBag.SearchName&sortByType=createdDate&sorting=@ViewBag.Sorting&searchPageSize=@ViewBag.SearchTagPageSize">Created Date</a>
                                                     </th>
                                                     <th rowspan="1" colspan="1" style="text-align:center;">
                                                         Status
                                                     </th>
-                                                    <th rowspan="1" colspan="1"></th>
-                                                </tr>
-                                                <tr role="row" class="search-form">                                                    
-                                                    <th rowspan="1" colspan="1" style="text-align: center; padding-right: 12px;"></th>
-                                                    @using (Html.BeginForm("Index", "Tag", FormMethod.Get, new { @class = "form-inline" }))
-                                                    {
-                                                        <th rowspan="1" colspan="1">
-                                                            <input type="text" name="searchTagName" placeholder="Tag Name" value="@ViewBag.SearchTagName" class="custom-search-input">
-                                                        </th>
-                                                        <th rowspan="1" colspan="1">
-                                                            <input type="text" name="searchTagCreator" id="txtCreator" placeholder="Creator" value="@ViewBag.SearchTagCreator" class="custom-search-input">
-                                                        </th>
-                                                        <th rowspan="1" colspan="1">
-                                                            <div class="row">
-                                                                <div class="col-md-6 col-sm-6">
-                                                                    <input type="date" name="searchTagCreatedDateFrom" class="custom-search-input" value="@ViewBag.SearchTagDateFrom">
-                                                                </div>
-                                                                <div class="col-md-6 col-sm-6">
-                                                                    <input type="date" name="searchTagCreatedDateTo" class="custom-search-input" value="@ViewBag.SearchTagDateTo">
-                                                                </div>
-                                                            </div>
-                                                        </th>
-                                                        <th rowspan="1" colspan="1">
-                                                            <select name="searchTagStatus" class="custom-search-input">
-                                                                <option value="">Select</option>
-                                                                <option value="1" @{ if (!(string.IsNullOrEmpty(ViewBag.SearchTagStatus))) { if (Int32.Parse(ViewBag.SearchTagStatus) == 1) { @Html.Raw("selected")  } } }>
-                                                                    Processing
-                                                                </option>
-                                                                <option value="0" @{ if (!(string.IsNullOrEmpty(ViewBag.SearchTagStatus))) { if (Int32.Parse(ViewBag.SearchTagStatus) == 0) { @Html.Raw("selected")  } } }>
-                                                                    Denied
-                                                                </option>
-                                                            </select>
-                                                        </th>
-
-                                                        <th style="padding-bottom:8px;text-align:center;">
-                                                            <button type="submit" class="btn btn-success custom-search-buttom">Search</button>
-                                                        </th>
-                                                    }
-                                                </tr>
+                                                    <th rowspan="1" colspan="1" style="text-align:center;">Actions</th>
+                                                </tr>                                                
                                             </thead>
                                             <tbody>
-                                                <p id="checkBoxes">
-                                                    @foreach (var item in Model)
-                                                    {
-                                                    <tr id="row_@item.Id">                                                        
+                                                @foreach (var item in Model)
+                                                {
+                                                    <tr id="row_@item.Id">
                                                         <td style="text-align: center;">@item.Id</td>
                                                         <td style="text-align:center;">@item.TagName</td>
                                                         <td style="text-align:center;">@item.Creator</td>
                                                         <td style="text-align:center;">@(item.CreatedDate.HasValue ? item.CreatedDate.Value.ToString("MM/dd/yyyy HH:mm:ss") : "")</td>
-                                                        <td style="text-align:center;"><a class="btn-active" data-id="@item.Id">@((bool)item.Status? "Processing" : "Blocked")</a></td>
+                                                        <td style="text-align:center;"><a style="color:white" class="change-status btn btn-sm @(item.Status.Equals("Processing") ? "btn-info" : "btn-danger")" data-id="@item.Id">@item.Status</a></td>
                                                         <td style="text-align:center;">
-                                                            <a href="/Admin/Tag/Detail/@item.Id"><span class="glyphicon glyphicon-eye-open"></span> Detail</a> |
-                                                            <a href="/Admin/Tag/Edit/@item.Id"><span class="glyphicon glyphicon-edit"></span> Edit</a> |
-                                                            <a data-ajax="true" data-ajax-complete="$('#row_@item.Id').remove()" data-ajax-confirm="Are you sure to change status of this tag" data-ajax-method="Delete" href="/Admin/Tag/Delete/@item.Id"><span class="glyphicon glyphicon-trash"></span> Delete</a>
-                                                            @*@Ajax.ActionLink("Delete", "Tag", new { @id = item.Id }, new AjaxOptions
-                                                            {
-                                                               Confirm = "Are you sure to change status of this category",
-                                                               OnComplete = "$('#row_" + item.Id + "').remove()",
-                                                               HttpMethod = "Delete"
-                                                            })*@
+                                                            <a href="/Admin/Tag/Detail/@item.Id" class="btn btn-sm btn-primary btn-grant"><i class="fa fa-eye-slash"></i></a>
+                                                            <a href="/Admin/Tag/Edit/@item.Id" class="btn btn-sm btn-info btn-edit"><i class="fa fa-pencil-square-o"></i></a>
+                                                            <a data-ajax="true" data-ajax-complete="$('#row_@item.Id').remove()" data-ajax-confirm="Are you sure to change status of this tag" data-ajax-method="Delete" href="/Admin/Tag/Delete/@item.Id" class="btn btn-sm btn-danger btn-delete"><i class="fa fa-trash-o"></i></a>
+
                                                         </td>
                                                     </tr>
                                                 }
-                                                    </p>
-                                                </tbody>
+
+                                                @if (ViewBag.TotalTagDisplay != null && ViewBag.TotalTagDisplay.Equals(0))
+                                                {
+                                                    <tr style="text-align:center;">
+                                                        <td colspan="6">There is no record</td>
+                                                    </tr>
+                                                }
+                                            </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -170,14 +125,10 @@
                                             <div class="dataTables_paginate paging_simple_numbers" id="datatable_paginate">
                                                 @Html.PagedListPager(Model, searchPage => Url.Action("Index", new
                                                 {
-                                                                                searchPage,
-                                                    searchTagName = ViewBag.SearchTagName,
-                                                                                searchTagCreator = ViewBag.SearchTagCreator,
-                                                                                searchTagCreatedDateFrom = ViewBag.SearchTagDateFrom,
-                                                                                searchTagCreatedDateTo = ViewBag.SearchTagDateTo,
-                                                                                searchTagStatus = ViewBag.SearchTagStatus,
-                                                                                searchPageSize = ViewBag.SearchTagPageSize
-                                                                        }))
+                                                    searchPage,
+                                                    searchName = ViewBag.SearchName,                                                                                
+                                                    searchPageSize = ViewBag.SearchTagPageSize
+                                                }))
                                             </div>
                                         </div>
                                     </div>

@@ -3,7 +3,7 @@
         tag.registerEvents();
     },
     registerEvents: function () {
-        $('.btn-active').off('click').on('click', function (e) {
+        $('.change-status').off('click').on('click', function (e) {
             e.preventDefault();
             var status = $(this);
             var id = status.data('id');
@@ -17,8 +17,12 @@
                     toastr.success("Change status success.")
                     if (response.status == true) {
                         status.text("Processing");
+                        status.removeClass("btn-danger");
+                        status.addClass("btn-info");
                     } else {
-                        status.text("Blocked");
+                        status.text("Block");
+                        status.addClass("btn-danger");
+                        status.removeClass("btn-info");
                     }
                 }
             });

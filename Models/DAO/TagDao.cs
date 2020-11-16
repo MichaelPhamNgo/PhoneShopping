@@ -17,17 +17,17 @@ namespace Models.DAO
             db = new ShoppingDbContext();
         }
 
-        public Tag getTagByName(string TagName)
+        public Tag getByName(string TagName)
         {
             return db.Tags.Where(tag => tag.TagName.Equals(TagName)).SingleOrDefault();
         }
 
-        public Tag GetById(long? Id)
+        public Tag getById(long? Id)
         {
             return db.Tags.Where(tag => tag.Id == Id).SingleOrDefault();
         }
 
-        public TagModel GetJoinUserById(long? Id)
+        public TagModel getJoinUserById(long? Id)
         {   
             return (from tag in db.Tags
                 join creator in db.Users
@@ -45,24 +45,20 @@ namespace Models.DAO
                     Creator = creator.UserName,
                     ModifiedDate = tag.ModifiedDate,
                     Modifier = modifier.UserName,
-                    Status = tag.Status
+                    Status = tag.Status == true ? "Processing" : "Blocked"
                 }).Where(tag => tag.Id == Id).FirstOrDefault();            
         }
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="searchTagName"></param>
-        /// <param name="searchStatus"></param>
-        /// <param name="searchCreator"></param>
-        /// <param name="searchCreatedDateFrom"></param>
-        /// <param name="searchCreateDateTo"></param>
+        /// <param name="searchName"></param>
+        /// <param name="sortByType"></param>
+        /// <param name="sorting"></param>
         /// <param name="searchPageSize"></param>
         /// <param name="searchPage"></param>
         /// <returns></returns>
-        public IEnumerable<TagModel> listAllPaging(string searchTagName, string searchCreator, 
-                                                        string searchCreatedDateFrom, string searchCreateDateTo, 
-                                                            string searchStatus, string sortByType, string sorting, 
+        public IEnumerable<TagModel> listAllPaging(string searchName, string sortByType, string sorting, 
                                                                 int searchPageSize, int searchPage)
         {            
             var sqlLinq = from tag in db.Tags
@@ -75,44 +71,14 @@ namespace Models.DAO
                               TagDescription = tag.TagDescription,
                               CreatedDate = tag.CreatedDate,
                               Creator = user.UserName,
-                              Status = tag.Status
+                              Status = tag.Status == true ? "Processing" : "Blocked"
                           };
-            if(!string.IsNullOrEmpty(searchTagName))
+            if(!string.IsNullOrEmpty(searchName))
             {
-                sqlLinq = sqlLinq.Where(tag => tag.TagName.Contains(searchTagName));
-            }
-
-            if(!string.IsNullOrEmpty(searchStatus))
-            {
-                var status = false;
-                if(Int32.Parse(searchStatus) == 1)
-                {
-                    status = true;
-                }
-                else
-                {
-                    status = false;
-                }
-
-                sqlLinq = sqlLinq.Where(tag => tag.Status == status);
-            }
-
-            if(!string.IsNullOrEmpty(searchCreator))
-            {
-                sqlLinq = sqlLinq.Where(tag => tag.Creator.Contains(searchCreator));
-            }
-
-            if(!string.IsNullOrEmpty(searchCreatedDateFrom))
-            {
-                var dateFrom = DateTime.Parse(searchCreatedDateFrom);
-                sqlLinq = sqlLinq.Where(tag => DateTime.Compare(dateFrom, tag.CreatedDate.Value) <= 0);
-            }
-
-            if(!string.IsNullOrEmpty(searchCreateDateTo))
-            {
-                var dateTo = DateTime.Parse(searchCreateDateTo);
-                sqlLinq = sqlLinq.Where(tag => DateTime.Compare(dateTo, tag.CreatedDate.Value) >= 0);
-            }
+                sqlLinq = sqlLinq.Where(tag => tag.TagName.Contains(searchName) 
+                                                    || tag.Creator.Contains(searchName)
+                                                    || tag.Status.Contains(searchName));
+            }            
 
             if(sortByType.Equals("tagName"))
             {
@@ -157,17 +123,9 @@ namespace Models.DAO
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="searchTagName"></param>
-        /// <param name="searchStatus"></param>
-        /// <param name="searchCreator"></param>
-        /// <param name="searchCreatedDateFrom"></param>
-        /// <param name="searchCreateDateTo"></param>
-        /// <param name="searchPageSize"></param>
-        /// <param name="searchPage"></param>
+        /// <param name="searchName"></param>
         /// <returns></returns>
-        public int totalRows(string searchTagName, string searchCreator,
-                                string searchCreatedDateFrom, string searchCreateDateTo,
-                                    string searchStatus)
+        public int totalRows(string searchName)
         {
             var sqlLinq = from tag in db.Tags
                           join user in db.Users
@@ -179,56 +137,25 @@ namespace Models.DAO
                               TagDescription = tag.TagDescription,
                               CreatedDate = tag.CreatedDate,
                               Creator = user.UserName,
-                              Status = tag.Status
+                              Status = tag.Status == true ? "Processing" : "Blocked"
                           };
-            if (!string.IsNullOrEmpty(searchTagName))
+            if (!string.IsNullOrEmpty(searchName))
             {
-                sqlLinq = sqlLinq.Where(tag => tag.TagName.Contains(searchTagName));
+                sqlLinq = sqlLinq.Where(tag => tag.TagName.Contains(searchName) 
+                                            || tag.Creator.Contains(searchName)
+                                            || tag.Status.Contains(searchName));
             }
-
-            if (!string.IsNullOrEmpty(searchStatus))
-            {
-                var status = false;
-                if (Int32.Parse(searchStatus) == 1)
-                {
-                    status = true;
-                }
-                else
-                {
-                    status = false;
-                }
-
-                sqlLinq = sqlLinq.Where(tag => tag.Status == status);
-            }
-
-            if (!string.IsNullOrEmpty(searchCreator))
-            {
-                sqlLinq = sqlLinq.Where(tag => tag.Creator.Contains(searchCreator));
-            }
-
-            if (!string.IsNullOrEmpty(searchCreatedDateFrom))
-            {
-                var dateFrom = DateTime.Parse(searchCreatedDateFrom);
-                sqlLinq = sqlLinq.Where(tag => DateTime.Compare(dateFrom, tag.CreatedDate.Value) <= 0);
-            }
-
-            if (!string.IsNullOrEmpty(searchCreateDateTo))
-            {
-                var dateTo = DateTime.Parse(searchCreateDateTo);
-                sqlLinq = sqlLinq.Where(tag => DateTime.Compare(dateTo, tag.CreatedDate.Value) >= 0);
-            }
-
             return sqlLinq.ToList().Count;
         }
 
-        public long CreateTag(Tag tag)
+        public long create(Tag tag)
         {
             db.Tags.Add(tag);
             db.SaveChanges();
             return tag.Id;
         }
 
-        public bool UpdateTag(Tag entity)
+        public bool update(Tag entity)
         {
             try
             {
@@ -250,7 +177,7 @@ namespace Models.DAO
             }
         }
 
-        public bool ChangeTagStatus(long? id)
+        public bool changeStatus(long? id)
         {
             try
             {
@@ -265,7 +192,7 @@ namespace Models.DAO
             }
         }
 
-        public bool DeleteTag(long? id)
+        public bool delete(long? id)
         {
             try
             {

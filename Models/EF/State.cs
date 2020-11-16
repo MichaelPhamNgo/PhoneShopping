@@ -10,22 +10,11 @@ namespace Models.EF
     public partial class State
     {
         public long Id { get; set; }
-
         [Required]
         [StringLength(50)]
         public string StateName { get; set; }
 
         [StringLength(250)]
         public string StateDescription { get; set; }
-
-        public DateTime? CreatedDate { get; set; }
-
-        public Guid? CreatedBy { get; set; }
-
-        public DateTime? ModifiedDate { get; set; }
-
-        public Guid? ModifiedBy { get; set; }
-
-        public bool? Status { get; set; }
     }
 }

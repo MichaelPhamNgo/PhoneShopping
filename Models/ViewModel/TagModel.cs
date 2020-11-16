@@ -15,6 +15,6 @@ namespace Models.ViewModel
         public string Creator { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string Modifier { get; set; }
-        public bool? Status { get; set; }        
+        public string Status { get; set; }        
     }
 }

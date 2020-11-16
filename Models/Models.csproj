@@ -61,6 +61,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DAO\ContactDao.cs" />
     <Compile Include="DAO\FunctionDao.cs" />
     <Compile Include="DAO\RoleDao.cs" />
     <Compile Include="DAO\StateDao.cs" />
@@ -92,8 +93,8 @@
     <Compile Include="EF\User.cs" />
     <Compile Include="EF\UserRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModel\ContactModel.cs" />
     <Compile Include="ViewModel\FunctionModel.cs" />
-    <Compile Include="ViewModel\StateModel.cs" />
     <Compile Include="ViewModel\TagModel.cs" />
   </ItemGroup>
   <ItemGroup>

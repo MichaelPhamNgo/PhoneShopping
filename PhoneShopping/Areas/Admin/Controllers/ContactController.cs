@@ -9,9 +9,40 @@ namespace PhoneShopping.Areas.Admin.Controllers
     public class ContactController : Controller
     {
         // GET: Admin/Contact
-        public ActionResult Index()
+        public ActionResult Index(string searchString, string sorting = "decs",
+                                            int searchPageSize = 10, int searchPage = 1)
         {
-            return View();
+            ViewBag.SearchString = searchString;
+            if (sorting.Equals("asc"))
+            {
+                sorting = "decs";
+            }
+            else
+            {
+                sorting = "asc";
+            }
+            ViewBag.Sorting = sorting;
+            ViewBag.SearchContactPage = searchPage;
+            ViewBag.SearchContactPageSize = searchPageSize;
+            var dao = new ContactDao();
+            var model = dao.listAllPaging(searchString, sorting, searchPageSize, searchPage);
+            var totalRows = dao.totalRows(searchString);
+            if (totalRows == 0)
+            {
+                ViewBag.SearchContactPageDisplay = 0;
+            }
+            else
+            {
+                ViewBag.SearchContactPageDisplay = (searchPage - 1) * searchPageSize + 1;
+            }
+
+            var pageRange = searchPage * searchPageSize;
+            if (totalRows > (pageRange))
+                ViewBag.SearchContactPageSizeDisplay = pageRange;
+            else
+                ViewBag.SearchContactPageSizeDisplay = totalRows;
+            ViewBag.TotalContactDisplay = totalRows;
+            return View(model);
         }
 
         // GET: Admin/Contact/Details/5

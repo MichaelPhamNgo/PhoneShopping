@@ -8,14 +8,14 @@
 @section scripts {    
     <script src="/Assets/Admin/build/js/toastr.min.js"></script>    
     <script>
-        @if (TempData.ContainsKey("CreateTagErrorMessage"))
+        @if (ViewBag.CreateTagErrorMessage != null)
         {
-            <text>$(document).ready(function () { toastr.error('@TempData["CreateTagErrorMessage"]'); });</text>
+            <text>$(document).ready(function () { toastr.error('@ViewBag.CreateTagErrorMessage'); });</text>
         }
 
-        @if (TempData.ContainsKey("CreateTagSuccessMessage"))
+        @if (ViewBag.CreateTagSuccessMessage != null)
         {
-            <text>$(document).ready(function () { toastr.success('@TempData["CreateTagSuccessMessage"]'); });</text>
+            <text>$(document).ready(function () { toastr.success('@ViewBag.CreateTagSuccessMessage'); });</text>
         }
     </script>
 }
@@ -68,7 +68,7 @@
                     <div class="ln_solid"></div>
                 }
                 <p>
-                    @Html.ActionLink("Back to tag index", "Index", "Tag")
+                    @Html.ActionLink("Back To Tag Index", "Index", "Tag")
                 </p>
             </div>
         </div>

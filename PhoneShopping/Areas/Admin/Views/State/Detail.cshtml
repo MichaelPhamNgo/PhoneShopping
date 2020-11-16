@@ -1,8 +1,57 @@
-﻿
+﻿@model Models.EF.State
+
 @{
-    ViewBag.Title = "Detail";
+    ViewBag.Title = "View State Detail";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Detail</h2>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","State")">State</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Detail</li>
+    </ol>
+</nav>
+<div class="clearfix"></div>
+<div class="row">
+    <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>View State Detail</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <br />
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        State Id
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.Id
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        State Name
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.StateName
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        State Description
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.StateDescription
+                    </div>
+                </div>
+                <div class="ln_solid"></div>
+                <p>
+                    @Html.ActionLink("Back To State Index", "Index", "State")
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 

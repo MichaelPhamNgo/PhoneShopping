@@ -25,16 +25,10 @@ namespace PhoneShopping.Areas.Admin.Controllers
         /// <param name="searchPageSize"></param>
         /// <param name="searchPage"></param>
         /// <returns></returns>
-        public ActionResult Index(string searchTagName, string searchTagCreator,
-                                    string searchTagCreatedDateFrom, string searchTagCreatedDateTo, 
-                                    string searchTagStatus, string sortByType = "createdDate",
+        public ActionResult Index(string searchString, string sortByType = "createdDate",
                                         string sorting = "decs", int searchPageSize = 10, int searchPage = 1)
         {
-            ViewBag.SearchTagName = searchTagName;
-            ViewBag.SearchTagCreator = searchTagCreator;
-            ViewBag.SearchTagDateFrom = searchTagCreatedDateFrom;
-            ViewBag.SearchTagDateTo = searchTagCreatedDateTo;            
-            ViewBag.SearchTagStatus = searchTagStatus;
+            ViewBag.SearchString = searchString;            
             ViewBag.SortByType = sortByType;
             if(sorting.Equals("asc"))
             {
@@ -47,16 +41,16 @@ namespace PhoneShopping.Areas.Admin.Controllers
             ViewBag.SearchTagPage = searchPage;
             ViewBag.SearchTagPageSize = searchPageSize;
             var dao = new TagDao();
-            var model = dao.listAllPaging(searchTagName, searchTagCreator, 
-                                            searchTagCreatedDateFrom, searchTagCreatedDateTo, 
-                                                searchTagStatus, sortByType, sorting, searchPageSize, searchPage);
-
-            
-            var totalRows = dao.totalRows(searchTagName, searchTagCreator,
-                                            searchTagCreatedDateFrom, searchTagCreatedDateTo,
-                                                searchTagStatus);
-
-            ViewBag.SearchTagPageDisplay = (searchPage - 1) * searchPageSize + 1;
+            var model = dao.listAllPaging(searchString, sortByType, sorting, searchPageSize, searchPage);            
+            var totalRows = dao.totalRows(searchString);
+            if (totalRows == 0)
+            {
+                ViewBag.SearchRolePageDisplay = 0;
+            }
+            else
+            {
+                ViewBag.SearchRolePageDisplay = (searchPage - 1) * searchPageSize + 1;
+            }            
 
             var pageRange = searchPage * searchPageSize;
             if (totalRows > (pageRange))
@@ -84,13 +78,13 @@ namespace PhoneShopping.Areas.Admin.Controllers
             }
             
             //check if id does not exist in database
-            if (dao.GetById(id) == null)
+            if (dao.getById(id) == null)
             {
                 Response.StatusCode = 404;
                 return View("NotFound");
             } else
             {
-                return View(dao.GetJoinUserById(id));
+                return View(dao.getJoinUserById(id));
             }            
         }
 
@@ -110,33 +104,34 @@ namespace PhoneShopping.Areas.Admin.Controllers
         /// <returns></returns>
         [HttpPost]
         public ActionResult Create(Tag tag)
-        {           
-            var dao = new TagDao();
-            var getTag = dao.getTagByName(tag.TagName);
-
-            //Check if tag name exits in database
-            if(getTag != null)
+        {
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Tag name exists in database.");
-                TempData["CreateTagErrorMessage"] = tag.TagName + " exists in database.";
-            }
+                var dao = new TagDao();
+                var getTag = dao.getByName(tag.TagName);
 
-            if(ModelState.IsValid)
-            {
+                //Check if tag name exits in database
+                if(getTag != null)
+                {
+                    ModelState.AddModelError("TagName", "Tag " + tag.TagName + " exists in database.");
+                    return View(tag);
+                }
+
+            
                 var entity = new Tag();
                 entity.TagName = tag.TagName;
                 entity.TagDescription = tag.TagDescription;                
                 entity.CreatedBy = ((UserLogin)Session[CommonConstants.USER_SESSION]).UserId;
                 entity.CreatedDate = DateTime.UtcNow;
                 entity.Status = true;
-                long id = dao.CreateTag(entity);
+                long id = dao.create(entity);
                 if (id > 0)
                 {
-                    TempData["CreateTagSuccessMessage"] = "Create " + tag.TagName + " Successful";
+                    ViewBag.CreateTagSuccessMessage = "Create " + tag.TagName + " successful";
                 }
                 else
                 {
-                    TempData["CreateTagErrorMessage"] = "Create " + tag.TagName + " failed";
+                    ViewBag.CreateTagErrorMessage = "Create " + tag.TagName + " failed";
                 }
             }            
             return View(tag);            
@@ -151,17 +146,17 @@ namespace PhoneShopping.Areas.Admin.Controllers
         {
             if (id == null)
             {
-                TempData["EditTagErrorMessage"] = "URL does not exist!";
-                return RedirectToAction("Index", "Tag");
+                Response.StatusCode = 404;
+                return View("NotFound");
             }
             else
             {
                 var dao = new TagDao();
-                var tag = dao.GetById(id);
+                var tag = dao.getById(id);
                 if (tag == null)
                 {
-                    TempData["EditTagErrorMessage"] = "TAG ID = " + id + " does not exist!";
-                    return RedirectToAction("Index", "Tag");
+                    Response.StatusCode = 404;
+                    return View("NotFound");
                 }
                 else
                 {
@@ -178,73 +173,44 @@ namespace PhoneShopping.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Edit(Tag tag)
         {
-            //Gọi lớp Models/Dao/TagDao.cs
-            var dao = new TagDao();
-
-            //Kiểm tra sự tồn tại của tag id. Do update nên id phải tồn tại.
-            var checkExistTag = dao.GetById(tag.Id);
-            if (checkExistTag == null)
-            {
-                TempData["EditTagErrorMessage"] = "Update TAG failed.";
-                ModelState.AddModelError("", "Update tag failed.");
-            }
-            
-            //Kiểm tra trường hợp nếu lưu tag name mới. Nếu đã tồi tại rồi thì thông báo
-            if (!tag.TagName.Equals(checkExistTag.TagName))
-            {
-                //Truy xuất dữ liệu tag name
-                var tagDetail = dao.getTagByName(tag.TagName);
-
-                //Nếu tag name đã tồn tại thì báo lỗi
-                if (tagDetail != null)
-                {
-                    TempData["EditTagErrorMessage"] = "The TAG NAME = " + tag.TagName + " exists in database.";
-                    ModelState.AddModelError("", "The tag name exists in database.");
-                }
-            }
-            
-
             if (ModelState.IsValid)
             {
+                var dao = new TagDao();
+            
+                var checkExistTag = dao.getById(tag.Id);
+                if (checkExistTag == null)
+                {
+                    Response.StatusCode = 404;
+                    return View("NotFound");
+                }            
+            
+                if (!tag.TagName.Equals(checkExistTag.TagName))
+                {                    
+                    var tagDetail = dao.getByName(tag.TagName);
+                    if (tagDetail != null)
+                    {                        
+                        ModelState.AddModelError("TagName", "Tag " + tag.TagName + " exists in database.");
+                        return View(tag);
+                    }
+                }
+            
                 var entity = new Tag();
                 entity.Id = tag.Id;
                 entity.TagName = tag.TagName;
                 entity.TagDescription = tag.TagDescription;
-                entity.ModifiedDate = DateTime.UtcNow;
-                //Lưu lại người tạo mới một tag
-                entity.ModifiedBy = ((UserLogin)Session[CommonConstants.USER_SESSION]).UserId;
-                //Lưu tag vào hệ thống
-                bool update = dao.UpdateTag(entity);
-                //Lưu tag vào hệ thống thành công
+                entity.ModifiedDate = DateTime.UtcNow;                
+                entity.ModifiedBy = ((UserLogin)Session[CommonConstants.USER_SESSION]).UserId;                
+                bool update = dao.update(entity);                
                 if (update)
                 {
-                    TempData["EditTagSuccessMessage"] = "Update TAG Successful";
-                    return RedirectToAction("Edit", "Tag", new RouteValueDictionary(new { id = tag.Id }));
+                    ViewBag.EditTagSuccessMessage = "Update tag successful";                    
                 }
                 else
                 {
-                    TempData["EditTagErrorMessage"] = "Update TAG failed";
-                    return RedirectToAction("Edit", "Tag", new RouteValueDictionary(new { id = tag.Id }));
-                }
+                    ViewBag.EditTagErrorMessage = "Update tag failed";                    
+                }                
             }
             return View(tag);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="UserName"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public JsonResult GetCreatorByUserName(string UserName)
-        {
-            using (ShoppingDbContext db = new ShoppingDbContext())
-            {
-                var username = (from user in db.Users
-                                where user.UserName.StartsWith(UserName)
-                                select new { label = user.UserName }).ToList();
-                return Json(username);
-            }
         }
 
         /// <summary>
@@ -255,7 +221,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
         [HttpPost]
         public JsonResult ChangeStatus(long? id)
         {
-            var result = new TagDao().ChangeTagStatus(id);
+            var result = new TagDao().changeStatus(id);
             return Json(new { status = result });           
         }
 
@@ -267,8 +233,26 @@ namespace PhoneShopping.Areas.Admin.Controllers
         [HttpDelete]
         public ActionResult Delete(long? id)
         {
-            new TagDao().DeleteTag(id);                     
-            return RedirectToAction("Index");
+            if (id == null)
+            {
+                Response.StatusCode = 404;
+                return View("NotFound");
+            }
+            else
+            {
+                var dao = new TagDao();
+                var role = dao.getById(id);
+                if (role == null)
+                {
+                    Response.StatusCode = 404;
+                    return View("NotFound");
+                }
+                else
+                {
+                    new TagDao().delete(id);                     
+                    return RedirectToAction("Index");
+                }
+            }
         }
     }
 }

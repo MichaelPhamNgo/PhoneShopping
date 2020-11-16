@@ -17,14 +17,14 @@ namespace Models.DAO
             db = new ShoppingDbContext();
         }
 
-        public Role getRoleByName(string RoleName)
+        public Role getByName(string RoleName)
         {
             return db.Roles.Where(tag => tag.Name.Equals(RoleName)).SingleOrDefault();
         }
 
-        public Role GetById(Guid Id)
+        public Role getById(string Id)
         {
-            return db.Roles.Where(role => role.Id.Equals(Id)).SingleOrDefault();
+            return db.Roles.Where(role => role.Id.ToString().Equals(Id)).SingleOrDefault();
         }
         
         public IEnumerable<Role> listAllPaging(string searchRoleName, string sorting, int searchPageSize, int searchPage)
@@ -55,14 +55,14 @@ namespace Models.DAO
             return sqlLinq.ToList().Count;
         }
 
-        public Guid Create(Role role)
+        public Guid create(Role role)
         {
             db.Roles.Add(role);
             db.SaveChanges();
             return role.Id;
         }
 
-        public bool Update(Role entity)
+        public bool update(Role entity)
         {
             try
             {
@@ -81,11 +81,11 @@ namespace Models.DAO
             }
         }
 
-        public bool Delete(Guid id)
+        public bool delete(string id)
         {
             try
             {
-                var role = db.Roles.Find(id);
+                var role = db.Roles.Find(Guid.Parse(id));
                 db.Roles.Remove(role);
                 db.SaveChanges();
                 return true;

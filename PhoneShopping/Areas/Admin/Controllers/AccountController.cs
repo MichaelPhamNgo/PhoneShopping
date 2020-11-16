@@ -49,26 +49,27 @@ namespace PhoneShopping.Areas.Admin.Controllers
             
             if (ModelState.IsValid)
             {
-                if(TempData.ContainsKey("ReCaptchaKey"))
+                if(Request.Form["g-recaptcha-response"] != null)
                 {
                     if (!ReCaptchaPassed(Request.Form["g-recaptcha-response"], ConfigurationManager.AppSettings["ReCaptcha.PrivateKey"].ToString()))
                     {
-                        TempData["LoginFailedErrorMessage"] = "Your account is blocked";
-                        ModelState.AddModelError(string.Empty, "You failed the CAPTCHA, stupid robot. Go play some 1x1 on SFs instead.");
+                        TempData["ReCaptchaKey"] = ConfigurationManager.AppSettings["ReCaptcha.PublicKey"].ToString();
+                        ViewData["LoginFailedErrorMessage"] = "You failed the CAPTCHA.";                        
                         return View(user);
                     }
                 }                
+                
                 var dao = new UserDao();
                 var getUser = dao.getUserByEmail(user.Email);
 
                 //If the email does not exist, show error messages
                 if (getUser == null)
                 {
-                    ModelState.AddModelError("Email", "Email account does not exist in database.");
+                    ModelState.AddModelError("Email", "Your email does not exist in database.");
                 }
                 else
                 {
-                    string securityStamp = getUser.SecurityStamp;
+                    string securityStamp = getUser.SecurityStamp.ToString();
                     string password = getUser.Password;
                     string comparePassword = Helper.EncodePassword(user.Password, securityStamp);
                     if (getUser.LockoutEnd == null || getUser.AccessFailedCount == null || getUser.LockoutEnabled == null)
@@ -105,7 +106,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
                                 //If password is not matched, reset and count the attempted login
                                 if (!password.Equals(comparePassword))
                                 {
-                                    ModelState.AddModelError("Password", "Password does not exist in database.");
+                                    ModelState.AddModelError("Password", "Password does not match.");
                                     dao.resetCountAttemptedLogin(getUser.Id, 1, Helper.nextDay(DateTimeOffset.UtcNow), false);
                                 }
                                 else
@@ -115,15 +116,14 @@ namespace PhoneShopping.Areas.Admin.Controllers
                                     userSession.UserName = getUser.UserName;
                                     userSession.Email = getUser.Email;
                                     Session.Add(CommonConstants.USER_SESSION, userSession);
-                                    TempData.Remove("ReCaptchaKey");
-                                    TempData.Remove("LoginFailedErrorMessage");
+                                    TempData.Remove("ReCaptchaKey");                                    
                                     dao.resetCountAttemptedLogin(getUser.Id, 1, Helper.nextDay(DateTimeOffset.UtcNow), false);
                                     return RedirectToAction("Index", "Home");
                                 }                                
                             }
                             else
                             {
-                                TempData["LoginFailedErrorMessage"] = "Your account is blocked";
+                                ViewData["LoginFailedErrorMessage"] = "Your account is blocked";
                             }
                         }
                         else
@@ -141,11 +141,12 @@ namespace PhoneShopping.Areas.Admin.Controllers
                                 else if (acessFailedCount > attemptLoginLock) //If number of login attempt exceeds 8, disable account a day
                                 {
                                     TempData["ReCaptchaKey"] = ConfigurationManager.AppSettings["ReCaptcha.PublicKey"].ToString();
-                                    TempData["LoginFailedErrorMessage"] = "Your account is blocked";
+                                    ViewData["LoginFailedErrorMessage"] = "Your account is blocked";
                                     dao.disableAccount(getUser.Id, acessFailedCount + 1, true);
                                 }
                                 else
                                 {
+                                    ModelState.AddModelError("Password", "Password does not match.");
                                     dao.countUserAttempt(getUser.Id, acessFailedCount + 1);
                                 }
                             }
@@ -155,8 +156,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
                                 userSession.UserId = getUser.Id;
                                 userSession.UserName = getUser.UserName;
                                 userSession.Email = getUser.Email;
-                                TempData.Remove("ReCaptchaKey");
-                                TempData.Remove("LoginFailedErrorMessage");
+                                TempData.Remove("ReCaptchaKey");                                
                                 Session.Add(CommonConstants.USER_SESSION, userSession);
                                 dao.resetCountAttemptedLogin(getUser.Id, 1, Helper.nextDay(DateTimeOffset.UtcNow), false);
                                 return RedirectToAction("Index", "Home");
@@ -167,7 +167,7 @@ namespace PhoneShopping.Areas.Admin.Controllers
             }
             return View(user);
         }
-
+        
         public ActionResult Create()
         {                   
             return View();
@@ -175,7 +175,42 @@ namespace PhoneShopping.Areas.Admin.Controllers
 
         [HttpPost]        
         public ActionResult Create(CreateUserModel user)
-        {            
+        {
+            if (ModelState.IsValid)
+            {
+                var dao = new UserDao();
+
+                var getUserByEmail = dao.getUserByEmail(user.Email);
+                if (getUserByEmail != null)
+                {
+                    ModelState.AddModelError("Email", "Email account exists in database.");
+                    return View(user);
+                }
+
+                var getUserByUsername = dao.getUserByEmail(user.UserName);
+                if (getUserByUsername != null)
+                {
+                    ModelState.AddModelError("Username", "Username exists in database.");
+                    return View(user);
+                }
+
+                var entity = new User();
+                entity.Id = Guid.NewGuid();
+                entity.UserName = user.UserName;
+                entity.Email = user.Email;                
+                entity.SecurityStamp = Guid.NewGuid();
+                entity.Password = Helper.EncodePassword(user.Password, entity.SecurityStamp.ToString());
+                entity.RegisteredDate = DateTime.UtcNow;
+                entity.Status = true;
+                Guid id = dao.createUser(entity);
+                if(id != null)
+                {
+                   return RedirectToAction("Login", "Account");
+                } else
+                {
+                    ViewData["CreateANewAccountFailedErrorMessage"] = "Create a new account failed.";                    
+                }
+            }
             return View(user);
         }
 

@@ -15,7 +15,17 @@ namespace Models.DAO
         {
             db = new ShoppingDbContext();
         }
-        
+
+        public bool checkUserByEmail(string Email)
+        {
+            var userExisted = db.Users.Where(u => u.Email.Equals(Email)).SingleOrDefault();
+            if(userExisted != null)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public User getUserByEmail(string Email)
         {
             return db.Users.Where(u => u.Email.Equals(Email)).SingleOrDefault();

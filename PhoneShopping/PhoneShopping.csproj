@@ -267,6 +267,7 @@
     <Compile Include="Areas\Admin\Controllers\UserController.cs" />
     <Compile Include="Areas\Admin\Models\CreateUserModel.cs" />
     <Compile Include="Areas\Admin\Models\LoginModel.cs" />
+    <Compile Include="Areas\Admin\Models\RegisterViewModel.cs" />
     <Compile Include="Common\CommonConstants.cs" />
     <Compile Include="Common\Helper.cs" />
     <Compile Include="Common\UserLogin.cs" />

@@ -25,16 +25,17 @@ namespace Models.EF
         public virtual DbSet<MenuType> MenuTypes { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<OrderDetail> OrderDetails { get; set; }
+        public virtual DbSet<Permission> Permissions { get; set; }
         public virtual DbSet<Product> Products { get; set; }
         public virtual DbSet<ProductCategory> ProductCategories { get; set; }
         public virtual DbSet<Role> Roles { get; set; }
+        public virtual DbSet<Serilog> Serilogs { get; set; }
         public virtual DbSet<Slide> Slides { get; set; }
         public virtual DbSet<State> States { get; set; }
         public virtual DbSet<SystemConfig> SystemConfigs { get; set; }
         public virtual DbSet<Tag> Tags { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserRole> UserRoles { get; set; }
-        public virtual DbSet<Permission> Permissions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -108,10 +109,6 @@ namespace Models.EF
 
             modelBuilder.Entity<SystemConfig>()
                 .Property(e => e.Type)
-                .IsUnicode(false);
-
-            modelBuilder.Entity<User>()
-                .Property(e => e.SecurityStamp)
                 .IsUnicode(false);
         }
     }

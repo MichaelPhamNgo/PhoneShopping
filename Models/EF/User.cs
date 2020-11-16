@@ -17,8 +17,7 @@ namespace Models.EF
         [StringLength(250)]
         public string Password { get; set; }
 
-        [StringLength(50)]
-        public string SecurityStamp { get; set; }
+        public Guid? SecurityStamp { get; set; }
 
         [StringLength(50)]
         public string FirstName { get; set; }

@@ -82,6 +82,7 @@
     <Compile Include="EF\Product.cs" />
     <Compile Include="EF\ProductCategory.cs" />
     <Compile Include="EF\Role.cs" />
+    <Compile Include="EF\Serilog.cs" />
     <Compile Include="EF\ShoppingDbContext.cs" />
     <Compile Include="EF\Slide.cs" />
     <Compile Include="EF\State.cs" />

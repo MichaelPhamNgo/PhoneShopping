@@ -9,11 +9,11 @@ using System.Web.Routing;
 
 namespace PhoneShopping.Areas.Admin.Controllers
 {
-    public class RoleController : Controller
+    public class RoleController : BaseController
     {        
-        public ActionResult Index(string searchRoleName, string sorting = "decs", int searchPageSize = 10, int searchPage = 1)
+        public ActionResult Index(string searchString, string sorting = "decs", int searchPageSize = 10, int searchPage = 1)
         {
-            ViewBag.SearchRoleName = searchRoleName;
+            ViewBag.SearchName = searchString;
             if (sorting.Equals("asc"))
             {
                 sorting = "decs";
@@ -26,18 +26,23 @@ namespace PhoneShopping.Areas.Admin.Controllers
             ViewBag.SearchRolePage = searchPage;
             ViewBag.SearchRolePageSize = searchPageSize;
             var dao = new RoleDao();
-            var model = dao.listAllPaging(searchRoleName, sorting, searchPageSize, searchPage);
-            var totalRows = dao.totalRows(searchRoleName);
+            var model = dao.listAllPaging(searchString, sorting, searchPageSize, searchPage);
+            var totalRows = dao.totalRows(searchString);
 
-            ViewBag.SearchRolePageDisplay = (searchPage - 1) * searchPageSize + 1;
+            if(totalRows == 0)
+            {
+                ViewBag.SearchRolePageDisplay = 0;
+            } else
+            {
+                ViewBag.SearchRolePageDisplay = (searchPage - 1) * searchPageSize + 1;
+            }            
 
             var pageRange = searchPage * searchPageSize;
             if (totalRows > (pageRange))
                 ViewBag.SearchRolePageSizeDisplay = pageRange;
             else
                 ViewBag.SearchRolePageSizeDisplay = totalRows;
-            ViewBag.TotalRoleDisplay = totalRows;
-
+            ViewBag.TotalRoleDisplay = totalRows;            
             return View(model);
         }
 
@@ -71,28 +76,30 @@ namespace PhoneShopping.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Create(Role role)
         {
-            var dao = new RoleDao();
-            var getRole = dao.GetById(role.Id);
-
-            //Check if tag name exits in database
-            if (getRole != null)
-            {
-                ModelState.AddModelError("", "ROLE ID exists in database.");
-                TempData["CreateRoleErrorMessage"] = role.Id + " exists in database.";
-            }
-
             if (ModelState.IsValid)
             {
+                var dao = new RoleDao();
+                var getRole = dao.getRoleByName(role.Name);
+
+                //Check if new role exsits
+                if (getRole != null)
+                {
+                    ModelState.AddModelError("Name", "Role " + role.Name + " exists in database.");
+                    return View(role);
+                }
+
                 var entity = new Role();
-                entity.Id = role.Id;               
-                Guid id = dao.CreateRole(entity);
+                entity.Id = Guid.NewGuid();
+                entity.Name = role.Name;
+                entity.Description = role.Description;
+                Guid id = dao.Create(entity);
                 if (id != null)
                 {
-                    TempData["CreateRoleSuccessMessage"] = "Create " + role.Name + " successful";
+                    ViewBag.CreateRoleSuccessMessage = "Create " + role.Name + " successful";
                 }
                 else
                 {
-                    TempData["CreateRoleErrorMessage"] = "Create " + role.Name + " failed";
+                    ViewBag.CreateRoleErrorMessage = "Create " + role.Name + " failed";
                 }
             }
             return View(role);
@@ -102,8 +109,8 @@ namespace PhoneShopping.Areas.Admin.Controllers
         {
             if (id == null)
             {
-                TempData["EditRoleErrorMessage"] = "URL does not exist!";
-                return RedirectToAction("Index", "Role");
+                Response.StatusCode = 404;
+                return View("NotFound");
             }
             else
             {
@@ -111,8 +118,8 @@ namespace PhoneShopping.Areas.Admin.Controllers
                 var role = dao.GetById(id);
                 if (role == null)
                 {
-                    TempData["EditTagErrorMessage"] = "ROLE ID = " + id + " does not exist!";
-                    return RedirectToAction("Index", "Role");
+                    Response.StatusCode = 404;
+                    return View("NotFound");
                 }
                 else
                 {
@@ -124,54 +131,71 @@ namespace PhoneShopping.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Edit(Role role)
         {            
-            var dao = new RoleDao();
-                        
-            var checkExistRole = dao.GetById(role.Id);
-            if (checkExistRole == null)
+            if(ModelState.IsValid)
             {
-                TempData["EditRoleErrorMessage"] = "Update ROLE failed.";
-                ModelState.AddModelError("", "Update role failed.");
-            }
-            
-            if (!role.Id.Equals(checkExistRole.Id))
-            {
-                var roleDetail = dao.GetById(role.Id);
+                var dao = new RoleDao();
 
-                //Nếu tag name đã tồn tại thì báo lỗi
-                if (roleDetail != null)
+                var checkExistRole = dao.GetById(role.Id);
+                if (checkExistRole == null)
                 {
-                    TempData["EditRoleErrorMessage"] = "The ROLE ID = " + role.Id + " exists in database.";
-                    ModelState.AddModelError("", "The role id exists in database.");
+                    ViewBag.EditRoleErrorMessage = "Update role failed.";
+                    return View(role);
                 }
-            }
 
+                if (!role.Id.Equals(checkExistRole.Id))
+                {
+                    var roleDetail = dao.GetById(role.Id);
 
-            if (ModelState.IsValid)
-            {
+                    //Nếu tag name đã tồn tại thì báo lỗi
+                    if (roleDetail != null)
+                    {
+                        ModelState.AddModelError("Name", "Role " + role.Name + " exists in database.");                        
+                        return View(role);
+                    }
+                }
+
                 var entity = new Role();
                 entity.Id = role.Id;
-                entity.Name = role.Name;                
-                bool update = dao.UpdateRole(entity);
-                //Lưu tag vào hệ thống thành công
+                entity.Name = role.Name;
+                entity.Description = role.Description;
+                bool update = dao.Update(entity);                
                 if (update)
                 {
-                    TempData["EditRoleSuccessMessage"] = "Update ROLE Successful";
+                    ViewBag.EditRoleSuccessMessage = "Update role Successful";
                     return RedirectToAction("Edit", "Role", new RouteValueDictionary(new { id = role.Id }));
                 }
                 else
                 {
-                    TempData["EditRoleErrorMessage"] = "Update ROLE failed";
+                    ViewBag.EditRoleErrorMessage = "Update role failed";
                     return RedirectToAction("Edit", "Role", new RouteValueDictionary(new { id = role.Id }));
-                }
-            }
+                }                
+            }            
             return View(role);
         }
 
         [HttpDelete]
-        public ActionResult Delete(string id)
+        public ActionResult Delete(Guid id)
         {
-            new RoleDao().DeleteRole(id);
-            return RedirectToAction("Index");
+            if (id == null)
+            {
+                Response.StatusCode = 404;
+                return View("NotFound");
+            }
+            else
+            {
+                var dao = new RoleDao();
+                var role = dao.GetById(id);
+                if (role == null)
+                {
+                    Response.StatusCode = 404;
+                    return View("NotFound");
+                }
+                else
+                {
+                    new RoleDao().Delete(id);
+                    return RedirectToAction("Index");
+                }
+            }
         }
     }    
 }

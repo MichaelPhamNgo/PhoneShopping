@@ -11,7 +11,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Gentelella Alela! | </title>
+    <title>Register An Account</title>
 
     <!-- Bootstrap -->
     <link href="/Assets/Admin/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -21,6 +21,8 @@
     <link href="/Assets/Admin/vendors/nprogress/nprogress.css" rel="stylesheet">
     <!-- Animate.css -->
     <link href="/Assets/Admin/vendors/animate.css/animate.min.css" rel="stylesheet">
+
+    <link href="/Assets/Admin/build/css/toastr.css" rel="stylesheet" />
 
     <!-- Custom Theme Style -->
     <link href="/Assets/Admin/build/css/custom.min.css" rel="stylesheet">
@@ -34,7 +36,7 @@
                     @using (Html.BeginForm("Create", "Account", FormMethod.Post))
                     {
                         @Html.AntiForgeryToken()
-                        <h1 class="text-center">Create Account</h1>
+                        <h1 class="text-center">Register An Account</h1>
                         <span class="text-danger">@ViewData["CreateANewAccountFailedErrorMessage"]</span>
                         <div>
                             @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
@@ -74,6 +76,18 @@
                 </section>
             </div>
         </div>
-    </div>    
+    </div>
+    <script src="/Scripts/jquery-3.5.1.min.js"></script>
+    <script src="/Assets/Admin/build/js/toastr.min.js"></script>
+    <script>
+        @if (ViewData["CreateUserSuccessMessage"] != null)
+        {
+            <text>$(document).ready(function () { toastr.success('@ViewData["CreateUserSuccessMessage"]'); });</text>
+        }
+        @if (ViewData["CreateUserErrorMessage"] != null)
+        {
+            <text>$(document).ready(function () { toastr.error('@ViewData["CreateUserErrorMessage"]'); });</text>
+        }
+    </script>
 </body>
 </html>

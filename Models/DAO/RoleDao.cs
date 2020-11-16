@@ -55,14 +55,14 @@ namespace Models.DAO
             return sqlLinq.ToList().Count;
         }
 
-        public Guid CreateRole(Role role)
+        public Guid Create(Role role)
         {
             db.Roles.Add(role);
             db.SaveChanges();
             return role.Id;
         }
 
-        public bool UpdateRole(Role entity)
+        public bool Update(Role entity)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace Models.DAO
             }
         }
 
-        public bool DeleteRole(string id)
+        public bool Delete(Guid id)
         {
             try
             {

@@ -1,8 +1,57 @@
-﻿
+﻿@model Models.EF.Role
+
 @{
-    ViewBag.Title = "Detail";
+    ViewBag.Title = "View Role Detail";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Detail</h2>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+        <li class="breadcrumb-item"><a href="@Url.Action("Index","Role")">Role</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Detail</li>
+    </ol>
+</nav>
+<div class="clearfix"></div>
+<div class="row">
+    <div class="col-md-12 col-sm-12 ">
+        <div class="x_panel">
+            <div class="x_title">
+                <h2>View Role Detail</h2>
+                <div class="clearfix"></div>
+            </div>
+            <div class="x_content">
+                <br />
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Role Id
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.Id
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Role Name
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.Name
+                    </div>
+                </div>
+                <div class="item form-group">
+                    <label class="col-md-3 col-sm-3">
+                        Role Description
+                    </label>
+                    <div class="col-md-6 col-sm-6 ">
+                        @Model.Description
+                    </div>
+                </div>                
+                <div class="ln_solid"></div>
+                <p>
+                    @Html.ActionLink("Back To Role Index", "Index", "Role")
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 

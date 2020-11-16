@@ -9,9 +9,11 @@ namespace Models.EF
     [Table("Role")]
     public partial class Role
     {
+        [Key]
         public Guid Id { get; set; }
 
         [StringLength(100)]
+        [Required(ErrorMessage = "Please input a new role.")]
         public string Name { get; set; }
 
         [StringLength(250)]

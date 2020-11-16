@@ -205,10 +205,10 @@ namespace PhoneShopping.Areas.Admin.Controllers
                 Guid id = dao.createUser(entity);
                 if(id != null)
                 {
-                   return RedirectToAction("Login", "Account");
+                    ViewData["CreateUserSuccessMessage"] = "Please confirm your email before login to website.";
                 } else
                 {
-                    ViewData["CreateANewAccountFailedErrorMessage"] = "Create a new account failed.";                    
+                    ViewData["CreateUserErrorMessage"] = "Create a new account failed.";                    
                 }
             }
             return View(user);
